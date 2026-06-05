@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Taal Chawla — AI Representative</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3348;
+      --accent: #6c63ff;
+      --accent-light: #8b85ff;
+      --user-bubble: #2a2d45;
+      --ai-bubble: #1e2235;
+      --text: #e8eaf6;
+      --text-muted: #8b90a8;
+      --success: #4caf82;
+      --radius: 14px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      max-width: 760px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+
+    .header-text h1 { font-size: 16px; font-weight: 600; }
+    .header-text p  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+    .live-badge {
+      margin-left: auto;
+      background: rgba(76,175,130,0.15);
+      color: var(--success);
+      border: 1px solid rgba(76,175,130,0.3);
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Chat window ── */
+    #chat-window {
+      flex: 1;
+      width: 100%; max-width: 760px;
+      overflow-y: auto;
+      padding: 24px 20px 12px;
+      display: flex; flex-direction: column; gap: 16px;
+      scroll-behavior: smooth;
+    }
+
+    .message { display: flex; gap: 10px; max-width: 88%; }
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.assistant { align-self: flex-start; }
+
+    .msg-icon {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; margin-top: 2px;
+    }
+    .message.user .msg-icon      { background: #3a3d60; }
+    .message.assistant .msg-icon { background: linear-gradient(135deg, var(--accent), #a78bfa); color: #fff; font-weight: 700; }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      line-height: 1.6;
+      font-size: 14.5px;
+    }
+    .message.user .bubble      { background: var(--user-bubble); border-bottom-right-radius: 4px; }
+    .message.assistant .bubble { background: var(--ai-bubble); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+
+    /* ── Typing indicator ── */
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      align-items: center; gap: 10px;
+    }
+    .typing-indicator.visible { display: flex; }
+    .dots { display: flex; gap: 5px; }
+    .dots span {
+      width: 7px; height: 7px; background: var(--text-muted);
+      border-radius: 50%; animation: bounce 1.3s infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: 0.15s; }
+    .dots span:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── Slot cards ── */
+    .slots-container {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+    }
+    .slot-btn {
+      background: var(--surface2);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .slot-btn:hover { background: var(--accent); color: #fff; }
+
+    /* ── Booking form ── */
+    .booking-form {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 10px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .booking-form p { font-size: 13px; color: var(--text-muted); }
+    .booking-form input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .booking-form input:focus { border-color: var(--accent); }
+    .booking-form input::placeholder { color: var(--text-muted); }
+    .confirm-btn {
+      background: var(--accent);
+      color: #fff; border: none;
+      border-radius: 8px; padding: 10px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .confirm-btn:hover { background: var(--accent-light); }
+    .confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Confirmation ── */
+    .booking-confirmed {
+      background: rgba(76,175,130,0.1);
+      border: 1px solid rgba(76,175,130,0.3);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-size: 14px; color: var(--success);
+    }
+
+    /* ── Input bar ── */
+    #input-bar {
+      width: 100%; max-width: 760px;
+      padding: 12px 20px 20px;
+      display: flex; gap: 10px; align-items: flex-end;
+    }
+
+    #user-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 14.5px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 120px;
+      transition: border-color 0.15s;
+      font-family: var(--font);
+    }
+    #user-input:focus  { border-color: var(--accent); }
+    #user-input::placeholder { color: var(--text-muted); }
+
+    #send-btn {
+      background: var(--accent);
+      border: none; color: #fff;
+      width: 44px; height: 44px;
+      border-radius: 11px;
+      font-size: 18px;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #send-btn:hover    { background: var(--accent-light); }
+    #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Starter prompts ── */
+    #starters {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 20px 16px;
+      max-width: 760px; width: 100%;
+    }
+    .starter {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .starter:hover { border-color: var(--accent); color: var(--text); }
+
+    /* scrollbar */
+    #chat-window::-webkit-scrollbar { width: 5px; }
+    #chat-window::-webkit-scrollbar-track { background: transparent; }
+    #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="avatar">T</div>
+  <div class="header-text">
+    <h1>Taal Chawla — AI Representative</h1>
+    <p>Ask about his background, projects, or schedule a call</p>
+  </div>
+  <div class="live-badge">LIVE</div>
+</header>
+
+<div id="chat-window">
+  </div>
+
+<div class="typing-indicator" id="typing">
+  <div class="msg-icon" style="background:linear-gradient(135deg,#6c63ff,#a78bfa);color:#fff;font-weight:700;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">T</div>
+  <div class="bubble" style="background:var(--ai-bubble);border:1px solid var(--border);">
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div id="starters">
+  <button class="starter" onclick="sendStarter(this)">Why should Scaler hire Taal?</button>
+  <button class="starter" onclick="sendStarter(this)">Tell me about NexusOps</button>
+  <button class="starter" onclick="sendStarter(this)">What is the Governor Pattern?</button>
+  <button class="starter" onclick="sendStarter(this)">Schedule a call</button>
+</div>
+
+<div id="input-bar">
+  <textarea id="user-input" rows="1" placeholder="Ask anything about Taal…"></textarea>
+  <button id="send-btn" onclick="sendMessage()" title="Send">&#8593;</button>
+</div>
+
+<script>
+  // Dynamic API Base mapping strategy prevents structural endpoint path dropouts
+  const API_BASE = window.location.origin;
+  const chatWindow = document.getElementById("chat-window");
+  const input = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+  const typing = document.getElementById("typing");
+  const starters = document.getElementById("starters");
+
+  let conversationHistory = [];
+  let pendingSlotStart = null;
+
+  // Auto-resize textarea container bounds
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  function sendStarter(btn) {
+    input.value = btn.textContent;
+    starters.style.display = "none";
+    sendMessage();
+  }
+
+  function appendMessage(role, content, extraHtml = "") {
+    const div = document.createElement("div");
+    div.className = `message ${role}`;
+    const icon = role === "user" ? "👤" : "T";
+    div.innerHTML = `
+      <div class="msg-icon">${icon}</div>
+      <div>
+        <div class="bubble">${content}</div>
+        ${extraHtml}
+      </div>`;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return div;
+  }
+
+  function showTyping() {
+    chatWindow.appendChild(typing);
+    typing.classList.add("visible");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function hideTyping() {
+    typing.classList.remove("visible");
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    starters.style.display = "none";
+    input.value = "";
+    input.style.height = "auto";
+    sendBtn.disabled = true;
+
+    appendMessage("user", escapeHtml(text));
+    conversationHistory.push({ role: "user", content: text });
+    showTyping();
+
+    const schedulingKeywords = ["schedule", "book", "call", "meeting", "available", "availability", "slot", "time"];
+    const wantsBooking = schedulingKeywords.some(kw => text.toLowerCase().includes(kw));
+
+    try {
+      if (wantsBooking) {
+        await handleBookingFlow(text);
+      } else {
+        await handleChat(text);
+      }
+    } catch (err) {
+      hideTyping();
+      appendMessage("assistant", "Sorry, I ran into an issue processing the message request. Please try again.");
+    }
+
+    sendBtn.disabled = false;
+  }
+
+  async function handleChat(text) {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
+    });
+    const data = await res.json();
+    hideTyping();
+    const reply = data.response || "I couldn't generate a response. Please try again.";
+    appendMessage("assistant", escapeHtml(reply));
+    conversationHistory.push({ role: "assistant", content: reply });
+  }
+
+  async function handleBookingFlow(text) {
+    const chatRes = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
+    });
+    const chatData = await chatRes.json();
+
+    const slotsRes = await fetch(`${API_BASE}/check-availability`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ timezone: "Asia/Kolkata" })
+    });
+    const slotsData = await slotsRes.json();
+    hideTyping();
+
+    if (!slotsData.slots || slotsData.slots.length === 0) {
+      appendMessage("assistant", "I couldn't locate available calendar slots right now. Please message Taal directly via email.");
+      return;
+    }
+
+    const slotsHtml = `
+      <div class="slots-container">
+        ${slotsData.slots.map(s =>
+          `<button class="slot-btn" onclick="selectSlot('${s.start}', '${escapeHtml(s.display)}', this)">${s.display}</button>`
+        ).join("")}
+      </div>`;
+
+    appendMessage("assistant", "Here are Taal's next available interview slots. Pick one to lock in a confirmed session:", slotsHtml);
+  }
+
+  function selectSlot(isoStart, displayTime, btn) {
+    pendingSlotStart = isoStart;
+    document.querySelectorAll(".slot-btn").forEach(b => b.disabled = true);
+    btn.style.background = "var(--accent)";
+    btn.style.color = "#fff";
+
+    const formDiv = document.createElement("div");
+    formDiv.className = "booking-form";
+    formDiv.innerHTML = `
+      <p>Booking for <strong>${displayTime}</strong>. Enter confirmation routing records:</p>
+      <input id="booking-name" type="text" placeholder="Your name" />
+      <input id="booking-email" type="email" placeholder="Your email address" />
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmBooking()">Confirm Meeting Seat</button>`;
+    chatWindow.appendChild(formDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  async function confirmBooking() {
+    const name = document.getElementById("booking-name").value.trim();
+    const email = document.getElementById("booking-email").value.trim();
+    if (!name || !email) {
+      alert("Please provide both name and email coordinate blocks.");
+      return;
+    }
+
+    document.getElementById("confirm-btn").disabled = true;
+    document.getElementById("confirm-btn").textContent = "Booking slot...";
+
+    try {
+      const res = await fetch(`${API_BASE}/book-slot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slot_start: pendingSlotStart,
+          attendee_name: name,
+          attendee_email: email,
+          timezone: "Asia/Kolkata"
+        })
+      });
+      const data = await res.json();
+
+      document.querySelector(".booking-form").remove();
+
+      if (data.confirmed) {
+        const confirmDiv = document.createElement("div");
+        confirmDiv.className = "booking-confirmed";
+        confirmDiv.innerHTML = `✓ <strong>Confirmed:</strong> ${data.confirmation_message}`;
+        chatWindow.appendChild(confirmDiv);
+        conversationHistory.push({ role: "assistant", content: data.confirmation_message });
+      } else {
+        appendMessage("assistant", "An error occurred compiling booking metadata. Please try again.");
+      }
+    } catch (err) {
+      appendMessage("assistant", "Calendar connection pipeline timed out. Please contact Taal directly.");
+    }
+
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/\n/g, "<br>");
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    appendMessage("assistant",
+      "Hi! I'm Taal's AI representative. I can walk you through his architectural tradeoffs on NexusOps, his confidence-aware brain classification research, or help you schedule an immediate calendar session with him. What can I highlight for you today?"
+    );
+  });
+</script>
+</body>
+</html>

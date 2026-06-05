@@ -1,0 +1,14 @@
+# Sensitive credentials & environment tracking files
+.env
+
+# Python internal compiler cache footprints
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local workspace specific dependencies
+venv/
+env/
+.miniconda/

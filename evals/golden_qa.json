@@ -1,0 +1,77 @@
+[
+  {
+    "question": "What is NexusOps?",
+    "expected_keywords": ["RAG", "Kubernetes", "LangGraph", "agentic"],
+    "source": "nexusops"
+  },
+  {
+    "question": "What latency improvement did NexusOps achieve?",
+    "expected_keywords": ["20x", "12ms", "240ms"],
+    "source": "nexusops"
+  },
+  {
+    "question": "What is the RAGAS Faithfulness score for NexusOps?",
+    "expected_keywords": ["0.95"],
+    "source": "nexusops"
+  },
+  {
+    "question": "Why did Taal use RRF instead of alpha blending for hybrid retrieval?",
+    "expected_keywords": ["hyperparameter", "rank", "score scale"],
+    "source": "nexusops"
+  },
+  {
+    "question": "What is the Governor Pattern in NexusOps?",
+    "expected_keywords": ["interrupt", "write", "HITL", "gate"],
+    "source": "nexusops"
+  },
+  {
+    "question": "Why did Taal use LangGraph instead of LangChain AgentExecutor?",
+    "expected_keywords": ["interrupt_before", "state machine", "HITL"],
+    "source": "nexusops"
+  },
+  {
+    "question": "What embedding model does NexusOps use and why?",
+    "expected_keywords": ["MiniLM", "local", "cost"],
+    "source": "nexusops"
+  },
+  {
+    "question": "What was Taal's ECE before and after temperature scaling?",
+    "expected_keywords": ["0.124", "0.031"],
+    "source": "brain_tumor"
+  },
+  {
+    "question": "Why did Taal use Temperature Scaling over Platt Scaling?",
+    "expected_keywords": ["one parameter", "post-hoc", "accuracy"],
+    "source": "brain_tumor"
+  },
+  {
+    "question": "What is the hallucination rate in the brain tumor project?",
+    "expected_keywords": ["2.78"],
+    "source": "brain_tumor"
+  },
+  {
+    "question": "Why did Taal use patient-wise splitting instead of random split?",
+    "expected_keywords": ["leakage", "patient", "generalisation"],
+    "source": "brain_tumor"
+  },
+  {
+    "question": "Where does Taal study?",
+    "expected_keywords": ["MAIT", "GGSIPU", "Delhi"],
+    "source": "resume"
+  },
+  {
+    "question": "What was Taal's internship at DRDO about?",
+    "expected_keywords": ["SSPL", "Silicon Carbide", "signal"],
+    "source": "resume"
+  },
+  {
+    "question": "What certifications does Taal hold?",
+    "expected_keywords": ["Anthropic", "MCP", "HuggingFace"],
+    "source": "resume"
+  },
+  {
+    "question": "What is Taal's CGPA?",
+    "expected_keywords": ["8.32"],
+    "source": "resume"
+  }
+]
