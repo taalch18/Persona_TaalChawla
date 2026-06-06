@@ -834,35 +834,43 @@
     @media (max-width: 950px) {
       body {
         padding: 0;
+        overflow-y: auto;
+        height: auto;
       }
       .command-panel {
         border-radius: 0;
         border: none;
         flex-direction: column;
+        height: auto;
+        min-height: 100vh;
       }
       .hologram-sidebar {
         width: 100%;
         height: auto;
-        max-height: 280px;
+        max-height: none;
         border-right: none;
         border-bottom: 2px solid var(--border);
       }
       .sidebar-scroll {
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        padding: 16px;
+        flex-direction: column;
+        overflow-y: visible;
+        overflow-x: hidden;
+        white-space: normal;
+        padding: 20px;
         gap: 16px;
-        height: 140px;
+        height: auto;
       }
       .cyber-card {
-        display: inline-block;
-        min-width: 280px;
-        vertical-align: top;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
       }
       .sidebar-header {
-        padding: 16px;
+        padding: 16px 20px;
+      }
+      .chat-section {
+        height: 650px;
       }
     }
   </style>
