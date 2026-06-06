@@ -403,33 +403,58 @@
   function hideTyping() { typing.classList.remove("visible"); }
 
   async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-    starters.style.display = "none";
-    input.value = ""; input.style.height = "auto";
-    sendBtn.disabled = true;
-    appendMessage("user", escapeHtml(text));
-    conversationHistory.push({ role: "user", content: text });
-    showTyping();
-    const slotsAlreadyShown = document.querySelector(".slots-container") !== null;
-    const bookingFormOpen   = document.querySelector(".booking-form") !== null;
+  const text = input.value.trim();
+  if (!text) return;
 
-    const wantsBooking = !slotsAlreadyShown && !bookingFormOpen && [
-      "schedule","book","meeting","available","availability","interview","connect",
-      "slot","catch up","10th","11th","12th","13th","14th","15th","16th",
-      "17th","18th","19th","20th","21st","22nd","23rd","24th","25th",
-      "monday","tuesday","wednesday","thursday","friday","tomorrow","next week"
-    ].some(k => text.toLowerCase().includes(k));
-      try {
-      if (wantsBooking) await handleBookingFlow(text);
-      else await handleChat(text);
-    } catch (err) {
-      console.error(err);
-      hideTyping();
-      appendMessage("assistant", "Connection issue — please try again.");
+  starters.style.display = "none";
+  input.value = ""; 
+  input.style.height = "auto";
+  sendBtn.disabled = true;
+
+  appendMessage("user", escapeHtml(text));
+  conversationHistory.push({ role: "user", content: text });
+  showTyping();
+
+  // 1. Detect if a booking form is actively open right now
+  const bookingFormOpen = document.querySelector(".booking-form") !== null;
+
+  // 2. Comprehensive intent keyword matrix for scheduling mutations
+  const schedulingKeywords = [
+    "schedule", "book", "meeting", "available", "availability", "interview", "connect",
+    "slot", "catch up", "cal", "calendar", "time", "day", "date", "other", "alternate",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "tomorrow", "next week",
+    "june", "july", "august"
+  ];
+
+  // 3. Regex matches raw numbers (12, 15) or standard ordinal date configurations (12th, 1st, 23rd)
+  const containsDatePattern = /\b\d{1,2}(st|nd|rd|th)?\b/.test(text.toLowerCase());
+
+  // 4. Evaluate intent: trigger booking if keywords match or date strings are detected, 
+  // unless they are actively filling out a confirmation form.
+  const wantsBooking = !bookingFormOpen && (
+    schedulingKeywords.some(k => text.toLowerCase().includes(k)) || containsDatePattern
+  );
+
+  try {
+    if (wantsBooking) {
+      // Disabling previously rendered slot buttons to preserve historical context clarity
+      document.querySelectorAll(".slots-container").forEach(el => {
+        el.style.opacity = "0.6";
+        el.querySelectorAll("button").forEach(btn => btn.disabled = true);
+      });
+      
+      await handleBookingFlow(text);
+    } else {
+      await handleChat(text);
     }
-    sendBtn.disabled = false;
+  } catch (err) {
+    console.error(err);
+    hideTyping();
+    appendMessage("assistant", "Connection issue — please try again.");
   }
+  
+  sendBtn.disabled = false;
+}
 
   async function handleChat(text) {
     const res = await fetch(`${API_BASE}/chat`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) }) });
