@@ -1,10 +1,3 @@
-"""
-Run once to populate Pinecone with embeddings from all source PDFs.
-Uses HuggingFace Inference API for embeddings — no torch required.
-
-Usage (from project root): python -m backend.rag.ingest
-"""
-
 import os
 import sys
 import time
@@ -23,9 +16,7 @@ from backend.rag.chunker import chunk_text
 HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
-    """
-    Sends text batches directly to the updated Hugging Face feature-extraction pipeline router.
-    """
+
     import httpx
     import time
     
@@ -34,10 +25,8 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
         "Content-Type": "application/json"
     }
     
-    # Structure the payload array to meet the updated pipeline configuration
     payload = {"inputs": texts}
     
-    # Built-in network resilience wrapper loop
     for attempt in range(3):
         try:
             response = httpx.post(
@@ -47,7 +36,6 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
                 timeout=30.0
             )
             
-            # Catch upstream model loading states (503) or rate limits gracefully
             if response.status_code == 503:
                 print(f"[HF INFRA] Model is warming up on the cluster. Retrying in 10s...")
                 time.sleep(10)
@@ -86,7 +74,6 @@ def main():
 
     pc = Pinecone(api_key=pc_key)
 
-    # Recreate index at 384-dim if needed
     existing = [i.name for i in pc.list_indexes()]
     if idx_name in existing:
         existing_dim = pc.describe_index(idx_name).dimension
@@ -133,7 +120,6 @@ def main():
 
     print(f"\nTotal chunks: {len(all_chunks)}")
 
-    # Batch embed and upsert — HF API handles up to 64 texts per request safely
     batch_size = 32
     for i in range(0, len(all_chunks), batch_size):
         batch = all_chunks[i: i + batch_size]
@@ -159,7 +145,6 @@ def main():
         index.upsert(vectors=vectors)
         print(f"  Upserted batch {i//batch_size + 1} ({len(vectors)} vectors)")
 
-        # Small delay to respect HF free tier rate limits
         time.sleep(1)
 
     print("\nIngestion complete.")

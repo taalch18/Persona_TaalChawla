@@ -1,11 +1,3 @@
-"""
-Hallucination eval — run against the live local server.
-Usage: python evals/run_eval.py
-
-Requires the FastAPI server to be running at localhost:8000.
-3-second delay between requests to avoid Gemini free-tier RPM limits.
-"""
-
 import asyncio
 import json
 import time

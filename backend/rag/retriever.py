@@ -1,9 +1,3 @@
-"""
-Retriever — embeds query via HuggingFace Inference API, queries Pinecone.
-Uses all-MiniLM-L6-v2 via HF API — same model as local, same 384-dim vectors.
-No torch, no sentence-transformers — works on Railway free tier.
-"""
-
 import asyncio
 import os
 from typing import Optional
@@ -22,7 +16,6 @@ def _get_index():
 
 
 async def _embed(text: str) -> list[float]:
-    """Embed text via HuggingFace Inference API — returns 384-dim vector."""
     headers = {}
     hf_token = os.getenv("HF_TOKEN")
     if hf_token:
@@ -37,7 +30,6 @@ async def _embed(text: str) -> list[float]:
         response.raise_for_status()
         result = response.json()
 
-    # HF returns either a flat list or nested list depending on input
     if isinstance(result[0], list):
         return result[0]
     return result
@@ -48,10 +40,7 @@ async def retrieve(
     top_k: int = 3,
     source_filter: Optional[str] = None,
 ) -> list[str]:
-    """
-    Embed query and retrieve matching chunks from Pinecone.
-    Returns list of chunk text strings.
-    """
+    
     index = _get_index()
 
     # 1. Embed the query
@@ -70,10 +59,9 @@ async def retrieve(
     if source_filter:
         query_params["filter"] = {"source": {"$eq": source_filter}}
 
-    # 3. Pinecone SDK is sync — offload to thread
     results = await asyncio.to_thread(index.query, **query_params)
 
-    # 4. Extract chunk texts
+    # 3. Extract chunk texts
     chunks = [
         match["metadata"]["text"]
         for match in results.get("matches", [])

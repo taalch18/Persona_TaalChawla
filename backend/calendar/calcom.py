@@ -1,8 +1,3 @@
-"""
-Cal.com v2 API wrapper.
-Docs: https://cal.com/docs/api-reference/v2
-"""
-
 import os
 from datetime import datetime, timedelta, timezone
 

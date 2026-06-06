@@ -2,14 +2,11 @@ import tiktoken
 from typing import List, Dict
 
 def chunk_text(text: str, source: str, chunk_size: int = 500, overlap: int = 100) -> List[Dict]:
-    """
-    Splits text into token-accurate chunks using tiktoken.
-    """
+
     text = text.strip()
     if not text:
         return []
 
-    # Using the specific encoding for the embedding model
     enc = tiktoken.get_encoding("cl100k_base") 
     tokens = enc.encode(text)
 

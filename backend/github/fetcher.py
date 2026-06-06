@@ -1,7 +1,5 @@
 """
 GitHub live fetcher — fetches README content and file tree at query time.
-Called when a user asks about a specific repo. Never cached — always fresh.
-
 Repos covered:
   nexusops     -> taalch18/NexusOps
   brain_tumor  -> taalch18/neuro_confidence_aware
@@ -14,13 +12,11 @@ import httpx
 
 GITHUB_API = "https://api.github.com"
 
-# Synchronized exactly with main.py filters and true repository namespaces
 REPO_MAP = {
     "nexusops": "taalch18/NexusOps",
     "brain_tumor": "taalch18/neuro_confidence_aware",
 }
 
-# Keywords that signal the user is asking about a specific repo
 REPO_KEYWORDS = {
     "nexusops": [
         "nexusops", "nexus ops", "kubernetes", "k8s", "langgraph",
@@ -39,7 +35,6 @@ REPO_KEYWORDS = {
 def detect_repo_from_query(query: str) -> Optional[str]:
     """
     Returns 'nexusops' or 'brain_tumor' if the query is about a specific repo.
-    Returns None if the query is general (resume, background, scheduling).
     """
     query_lower = query.lower()
     for repo_id, keywords in REPO_KEYWORDS.items():
@@ -57,10 +52,7 @@ def _github_headers() -> dict:
 
 
 async def fetch_readme(repo_id: str) -> str:
-    """
-    Fetches the raw README.md content for the given repo_id.
-    Returns the markdown content as a string.
-    """
+    
     repo = REPO_MAP.get(repo_id)
     if not repo:
         return ""
@@ -83,10 +75,6 @@ async def fetch_readme(repo_id: str) -> str:
 
 
 async def fetch_file_tree(repo_id: str) -> str:
-    """
-    Fetches the top-level file and directory structure of the repo.
-    Returns a formatted string showing the project layout.
-    """
     repo = REPO_MAP.get(repo_id)
     if not repo:
         return ""
@@ -110,10 +98,7 @@ async def fetch_file_tree(repo_id: str) -> str:
 
 
 async def fetch_repo_context(repo_id: str) -> str:
-    """
-    Fetches README + file tree for a repo and returns combined context string.
-    This is what gets injected into the LLM prompt alongside Pinecone chunks.
-    """
+
     readme, tree = await asyncio.gather(
         fetch_readme(repo_id),
         fetch_file_tree(repo_id),
@@ -129,7 +114,6 @@ async def fetch_repo_context(repo_id: str) -> str:
 
 
 def _get_offline_readme_fallback(repo_id: str) -> str:
-    """Provides local baseline fallback mock architectures if tokens are unconfigured locally."""
     if repo_id == "nexusops":
         return (
             "Architecture: Modular, asynchronous RAG infrastructure pipeline built over FastAPI.\n"

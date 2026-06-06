@@ -4,7 +4,6 @@ import traceback
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-# Path resolution — works locally and on Railway
 if os.getenv("RAILWAY_ENVIRONMENT"):
     WORKSPACE_ROOT = Path(os.getcwd())
 else:
@@ -33,14 +32,12 @@ from backend.models.schemas import (
 from backend.persona.system_prompt import build_system_prompt
 from backend.rag.retriever import retrieve
 
-# ── Constants ──────────────────────────────────────────────────────────────────
 MAX_PINECONE_CHARS = 3000
 MAX_GITHUB_CHARS   = 800
 MAX_OUTPUT_TOKENS  = 400
 HISTORY_TURNS      = 4
 GROQ_MODEL         = "llama-3.1-8b-instant"
 
-# ── GitHub cache — populated once at boot ──────────────────────────────────────
 REPO_CACHE: dict[str, str] = {"nexusops": "", "brain_tumor": ""}
 
 
@@ -73,8 +70,6 @@ app.add_middleware(
 
 groq_client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
 
-
-# ── Source routing helpers ─────────────────────────────────────────────────────
 
 def detect_source_filter(message: str) -> str | None:
     m = message.lower()
@@ -115,9 +110,6 @@ def detect_github_repo(message: str) -> str | None:
         return "brain_tumor"
     return None
 
-
-# ── /chat ──────────────────────────────────────────────────────────────────────
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
 
@@ -136,7 +128,7 @@ async def chat_endpoint(request: ChatRequest):
     if len(pinecone_context) > MAX_PINECONE_CHARS:
         pinecone_context = pinecone_context[:MAX_PINECONE_CHARS] + "\n...[trimmed]"
 
-    # 2. GitHub context — only injected when question is repo-specific
+    # 2. GitHub context
     github_context = ""
     repo_id = detect_github_repo(request.message)
     if repo_id and REPO_CACHE.get(repo_id):
@@ -177,7 +169,7 @@ async def chat_endpoint(request: ChatRequest):
 
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"LLM call failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"LLM call failed.")
 
     sources_used = []
     if github_context:
@@ -188,7 +180,7 @@ async def chat_endpoint(request: ChatRequest):
     return ChatResponse(response=response_text, sources_used=sources_used)
 
 
-# ── Calendar routes ────────────────────────────────────────────────────────────
+# Calendar routes 
 
 @app.post("/check-availability")
 async def check_availability_endpoint(request: AvailabilityRequest):
@@ -232,8 +224,6 @@ async def book_slot_endpoint(request: BookingRequest):
         traceback.print_exc()
         raise HTTPException(status_code=502, detail=f"Booking failed: {str(e)}")
 
-
-# ── Infra routes ───────────────────────────────────────────────────────────────
 
 @app.get("/health")
 async def health_check():
