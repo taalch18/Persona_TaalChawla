@@ -21,8 +21,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from groq import AsyncGroq
 
-from backend.calendar.calcom import create_booking, get_available_slots
-from backend.github.fetcher import fetch_repo_context
+from backend.calendar.calcom import create_booking, get_available_slots, get_slots_for_datefrom backend.github.fetcher import fetch_repo_context
 from backend.models.schemas import (
     AvailabilityRequest,
     BookingRequest,
@@ -181,7 +180,10 @@ async def chat_endpoint(request: ChatRequest):
 
 
 # Calendar routes 
-
+class DateAvailabilityRequest(BaseModel):
+    target_date: str   # YYYY-MM-DD
+    timezone: str = "Asia/Kolkata"
+    
 @app.post("/check-availability")
 async def check_availability_endpoint(request: AvailabilityRequest):
     event_type_id = os.getenv("CALCOM_EVENT_TYPE_ID")
@@ -192,7 +194,7 @@ async def check_availability_endpoint(request: AvailabilityRequest):
             event_type_id=event_type_id,
             user_timezone=request.timezone,
         )
-        return {"slots": slots[:3]}
+        return {"slots": slots}
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=502, detail=f"Cal.com error: {str(e)}")
