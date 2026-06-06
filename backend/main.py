@@ -21,7 +21,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from groq import AsyncGroq
 
-from backend.calendar.calcom import create_booking, get_available_slots, get_slots_for_datefrom backend.github.fetcher import fetch_repo_context
+from backend.calendar.calcom import create_booking, get_available_slots, get_slots_for_date
 from backend.models.schemas import (
     AvailabilityRequest,
     BookingRequest,
