@@ -3,6 +3,7 @@ import sys
 import traceback
 from pathlib import Path
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
 
 if os.getenv("RAILWAY_ENVIRONMENT"):
     WORKSPACE_ROOT = Path(os.getcwd())
