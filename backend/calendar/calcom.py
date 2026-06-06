@@ -31,16 +31,19 @@ async def get_available_slots(
     event_type_id: str,
     user_timezone: str = "Asia/Kolkata",
 ) -> list[dict]:
-    """
-    Returns next available slots from Cal.com.
-    Each slot: {"start": original_iso_string, "display": human_readable}
-    """
-    now = datetime.now(timezone.utc)
+    
+    from datetime import timezone as tz
+    import zoneinfo
+
+    ist = zoneinfo.ZoneInfo("Asia/Kolkata")
+    now = datetime.now(tz.utc)
+    now_ist = now.astimezone(ist)
     end = now + timedelta(days=14)
+    end_ist = end.astimezone(ist)
 
     params = {
-        "startTime": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "endTime": end.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "startTime": now_ist.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "endTime": end_ist.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eventTypeId": event_type_id,
         "timeZone": user_timezone,
     }
