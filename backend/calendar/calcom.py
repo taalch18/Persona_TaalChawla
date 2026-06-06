@@ -1,9 +1,11 @@
 import os
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import httpx
 
 CALCOM_BASE = "https://api.cal.com/v2"
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def _headers() -> dict:
@@ -27,27 +29,14 @@ def _format_display(iso_time: str) -> str:
         return iso_time
 
 
-async def get_available_slots(
-    event_type_id: str,
-    user_timezone: str = "Asia/Kolkata",
-) -> list[dict]:
-    
-    from datetime import timezone as tz
-    import zoneinfo
-
-    ist = zoneinfo.ZoneInfo("Asia/Kolkata")
-    now = datetime.now(tz.utc)
-    now_ist = now.astimezone(ist)
-    end = now + timedelta(days=14)
-    end_ist = end.astimezone(ist)
-
+async def _fetch_slots(start_dt: datetime, end_dt: datetime, event_type_id: str, user_timezone: str) -> list[dict]:
+    """Raw slot fetch between two UTC datetimes."""
     params = {
-        "startTime": now_ist.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "endTime": end_ist.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "startTime": start_dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "endTime":   end_dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eventTypeId": event_type_id,
         "timeZone": user_timezone,
     }
-
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.get(
             f"{CALCOM_BASE}/slots/available",
@@ -60,15 +49,69 @@ async def get_available_slots(
     slots = []
     for date_key in sorted(data.get("data", {}).get("slots", {}).keys()):
         for slot in data["data"]["slots"][date_key]:
-            iso_time = slot["time"]
             slots.append({
-                "start": iso_time,          # pass this back as-is for booking
-                "display": _format_display(iso_time),
+                "start":   slot["time"],
+                "display": _format_display(slot["time"]),
+                "date":    date_key,
             })
-            if len(slots) >= 3:
-                return slots
-
     return slots
+
+
+async def get_available_slots(
+    event_type_id: str,
+    user_timezone: str = "Asia/Kolkata",
+) -> list[dict]:
+    """
+    Returns 3 slots spread across different days.
+    If all 3 happen to be on the same day, still returns them.
+    """
+    now = datetime.now(timezone.utc)
+    end = now + timedelta(days=14)
+
+    all_slots = await _fetch_slots(now, end, event_type_id, user_timezone)
+
+    # Pick one slot per day until we have 3
+    seen_dates = set()
+    selected = []
+    for slot in all_slots:
+        if slot["date"] not in seen_dates:
+            seen_dates.add(slot["date"])
+            selected.append(slot)
+        if len(selected) == 3:
+            break
+
+    # Fallback: if fewer than 3 unique days, just take first 3 slots
+    if len(selected) < 3:
+        selected = all_slots[:3]
+
+    return [{"start": s["start"], "display": s["display"]} for s in selected]
+
+
+async def get_slots_for_date(
+    event_type_id: str,
+    target_date: str,
+    user_timezone: str = "Asia/Kolkata",
+) -> list[dict]:
+    """
+    Returns up to 3 slots on a specific date.
+    target_date format: 'YYYY-MM-DD'
+    """
+    # Build UTC window covering the full IST day
+    date_obj = datetime.strptime(target_date, "%Y-%m-%d")
+    # Start of that day in IST = 00:00 IST = previous day 18:30 UTC
+    start_ist = datetime(date_obj.year, date_obj.month, date_obj.day, 0, 0, 0, tzinfo=IST)
+    end_ist   = datetime(date_obj.year, date_obj.month, date_obj.day, 23, 59, 0, tzinfo=IST)
+
+    start_utc = start_ist.astimezone(timezone.utc)
+    end_utc   = end_ist.astimezone(timezone.utc)
+
+    all_slots = await _fetch_slots(start_utc, end_utc, event_type_id, user_timezone)
+
+    # Filter to only slots on the target date
+    day_slots = [s for s in all_slots if s["date"] == target_date]
+
+    # Return first 3
+    return [{"start": s["start"], "display": s["display"]} for s in day_slots[:3]]
 
 
 async def create_booking(
@@ -78,10 +121,6 @@ async def create_booking(
     attendee_email: str,
     user_timezone: str = "Asia/Kolkata",
 ) -> dict:
-    """
-    Creates a confirmed booking on Cal.com.
-    start: ISO 8601 string exactly as returned by get_available_slots
-    """
     payload = {
         "eventTypeId": int(event_type_id),
         "start": start,
@@ -92,19 +131,14 @@ async def create_booking(
             "language": "en",
         },
     }
-
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.post(
             f"{CALCOM_BASE}/bookings",
             json=payload,
             headers=_headers(),
         )
-
         if response.status_code not in (200, 201):
-            # Print full response for debugging
-            print(f"[CALCOM ERROR] Status {response.status_code}: {response.text}")
+            print(f"[CALCOM ERROR] {response.status_code}: {response.text}")
             response.raise_for_status()
-
         data = response.json()
-
     return data.get("data", {})
