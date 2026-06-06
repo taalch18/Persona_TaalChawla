@@ -408,8 +408,15 @@
     conversationHistory.push({ role: "user", content: text });
     showTyping();
     const slotsAlreadyShown = document.querySelector(".slots-container") !== null;
-    const wantsBooking = !slotsAlreadyShown && ["schedule","book","call","meeting","available","availability","slot","10th","11th","12th","13th","14th","15th","16th","17th","18th","19th","20th","monday","tuesday","wednesday","thursday","friday","saturday","sunday","tomorrow","next week","interview","connect"].some(k => text.toLowerCase().includes(k));
-    try {
+    const bookingFormOpen   = document.querySelector(".booking-form") !== null;
+
+    const wantsBooking = !slotsAlreadyShown && !bookingFormOpen && [
+      "schedule","book","meeting","available","availability","interview","connect",
+      "slot","catch up","10th","11th","12th","13th","14th","15th","16th",
+      "17th","18th","19th","20th","21st","22nd","23rd","24th","25th",
+      "monday","tuesday","wednesday","thursday","friday","tomorrow","next week"
+    ].some(k => text.toLowerCase().includes(k));
+      try {
       if (wantsBooking) await handleBookingFlow(text);
       else await handleChat(text);
     } catch (err) {
