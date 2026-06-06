@@ -19,6 +19,7 @@
       --text: #e8eaf6;
       --text-muted: #8b90a8;
       --success: #4caf82;
+      --danger: #ef4444;
       --radius: 14px;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
     }
@@ -56,8 +57,36 @@
     .header-text h1 { font-size: 16px; font-weight: 600; }
     .header-text p  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 
-    .live-badge {
+    /* ── Action Triggers ── */
+    .header-actions {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Modernized Voice WebRTC Control Button */
+    #vapi-call-btn {
+      background: var(--success);
+      color: #fff;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 4px 12px rgba(76, 175, 130, 0.2);
+    }
+    #vapi-call-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .live-badge {
       background: rgba(76,175,130,0.15);
       color: var(--success);
       border: 1px solid rgba(76,175,130,0.3);
@@ -242,11 +271,13 @@
     <h1>Taal Chawla — AI Representative</h1>
     <p>Ask about his background, projects, or schedule a call</p>
   </div>
-  <div class="live-badge">LIVE</div>
+  <div class="header-actions">
+    <button id="vapi-call-btn">📞 Talk to Agent</button>
+    <div class="live-badge">LIVE</div>
+  </div>
 </header>
 
-<div id="chat-window">
-  </div>
+<div id="chat-window"></div>
 
 <div class="typing-indicator" id="typing">
   <div class="msg-icon" style="background:linear-gradient(135deg,#6c63ff,#a78bfa);color:#fff;font-weight:700;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">T</div>
@@ -267,8 +298,9 @@
   <button id="send-btn" onclick="sendMessage()" title="Send">&#8593;</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@1.0.0/dist/vapi.browser.js"></script>
+
 <script>
-  // Dynamic API Base mapping strategy prevents structural endpoint path dropouts
   const API_BASE = window.location.origin;
   const chatWindow = document.getElementById("chat-window");
   const input = document.getElementById("user-input");
@@ -279,7 +311,37 @@
   let conversationHistory = [];
   let pendingSlotStart = null;
 
-  // Auto-resize textarea container bounds
+  // ── Vapi Web Orchestration Integration Layer ──
+  // IMPORTANT: Replace this placeholder with your extracted Widget Alphanumeric Public Key!
+  const VAPI_PUBLIC_KEY = 'cc69b607-e33b-41f2-81e1-7b52b5adc6df'; 
+  const vapi = new Vapi(VAPI_PUBLIC_KEY);
+  const voiceCallBtn = document.getElementById('vapi-call-btn');
+  let isVoiceActive = false;
+
+  voiceCallBtn.addEventListener('click', () => {
+    if (!isVoiceActive) {
+      // Connect immediate audio microphone capture pipeline straight through to Vapi cluster
+      vapi.start(VAPI_PUBLIC_KEY);
+      voiceCallBtn.innerHTML = "🛑 End Voice Call";
+      voiceCallBtn.style.background = "var(--danger)";
+      isVoiceActive = true;
+    } else {
+      // Gracefully step down channel streams
+      vapi.stop();
+      voiceCallBtn.innerHTML = "📞 Talk to Agent";
+      voiceCallBtn.style.background = "var(--success)";
+      isVoiceActive = false;
+    }
+  });
+
+  // Keep web page buttons in sync if the user hangs up from the voice server side
+  vapi.on('call-end', () => {
+    voiceCallBtn.innerHTML = "📞 Talk to Agent";
+    voiceCallBtn.style.background = "var(--success)";
+    isVoiceActive = false;
+  });
+
+  // ── Standard Text Conversational Engine Logic ──
   input.addEventListener("input", () => {
     input.style.height = "auto";
     input.style.height = Math.min(input.scrollHeight, 120) + "px";
