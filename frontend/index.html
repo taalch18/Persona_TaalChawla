@@ -3,36 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taal Chawla — AI Command Center</title>
-  <!-- Google Fonts -->
+  <title>Taal Chawla — AI Representative</title>
+  <!-- Google Fonts for premium typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    /* ── Cyberpunk / Holographic Theme Variables ── */
+    /* ── Design Tokens & Base Styles ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
     :root {
-      --bg: #03050d;
-      --glass: rgba(6, 10, 26, 0.65);
-      --glass-bright: rgba(15, 23, 56, 0.8);
-      --border: rgba(124, 58, 237, 0.15);
-      --border-glow: rgba(124, 58, 237, 0.4);
-      --neon-violet: #8b5cf6;
-      --neon-cyan: #06b6d4;
-      --neon-green: #10b981;
-      --neon-red: #f43f5e;
-      --text-glow: 0 0 10px rgba(139, 92, 246, 0.5);
+      --bg: #060813;
+      --glass: rgba(13, 17, 34, 0.75);
+      --glass-hover: rgba(22, 28, 54, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-glow: rgba(124, 58, 237, 0.35);
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.5);
+      --accent-light: #a78bfa;
       --text: #f3f4f6;
       --text-muted: #9ca3af;
-      --font-cyber: 'Orbitron', sans-serif;
+      --text-dark: #6b7280;
+      --user-bubble: #1e1b4b;
+      --ai-bubble: #0f172a;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --sidebar-width: 380px;
+      --font-display: 'Outfit', sans-serif;
       --font-body: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
       font-family: var(--font-body);
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
       color: var(--text);
       height: 100vh;
       height: 100dvh;
@@ -41,115 +50,66 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
-      position: relative;
     }
 
-    /* Ambient Shifting Mesh Gradients */
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: 
-        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.18) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(10, 15, 40, 1) 0%, rgba(3, 5, 13, 1) 100%);
-      z-index: -2;
-    }
-
-    /* Holographic Scanline Grid Overlay */
-    body::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: 
-        linear-gradient(rgba(18, 16, 35, 0.3) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(18, 16, 35, 0.3) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    /* ── Main Command Panel ── */
-    .command-panel {
+    /* ── Main Container (Glassmorphic Window) ── */
+    .app-container {
       width: 100%;
-      max-width: 1340px;
+      max-width: 1280px;
       height: 100%;
       background: var(--glass);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border: 2px solid var(--border);
-      border-radius: 30px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
       display: flex;
       overflow: hidden;
-      box-shadow: 
-        0 0 40px rgba(0, 0, 0, 0.6),
-        inset 0 0 30px rgba(139, 92, 246, 0.05);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       position: relative;
     }
 
-    /* Cybernetic framing corner highlights */
-    .panel-corner {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--neon-cyan);
-      z-index: 5;
-      pointer-events: none;
-    }
-    .corner-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: 30px; }
-    .corner-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; border-top-right-radius: 30px; }
-    .corner-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; border-bottom-left-radius: 30px; }
-    .corner-br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: 30px; }
-
-    /* ── Left Sidebar (Holographic Core) ── */
-    .hologram-sidebar {
-      width: 420px;
-      border-right: 2px solid var(--border);
+    /* ── Left Sidebar (Dashboard) ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      border-right: 1px solid var(--glass-border);
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: rgba(4, 7, 20, 0.5);
+      background: rgba(10, 12, 26, 0.4);
       flex-shrink: 0;
-      position: relative;
     }
 
     .sidebar-header {
-      padding: 30px 24px;
-      border-bottom: 1px solid var(--border);
+      padding: 28px;
+      border-bottom: 1px solid var(--glass-border);
       display: flex;
       align-items: center;
       gap: 16px;
-      position: relative;
     }
 
     .sidebar-header .avatar-glow {
       position: relative;
-      width: 60px;
-      height: 60px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      background: rgba(139, 92, 246, 0.1);
-      border: 2px solid var(--neon-violet);
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-cyber);
+      font-family: var(--font-display);
       font-size: 24px;
-      font-weight: 900;
+      font-weight: 800;
       color: #fff;
-      text-shadow: var(--text-glow);
-      box-shadow: 
-        0 0 15px rgba(139, 92, 246, 0.3),
-        inset 0 0 10px rgba(139, 92, 246, 0.2);
+      box-shadow: 0 0 20px var(--accent-glow);
     }
 
-    /* Spinning tech ring around avatar */
-    .sidebar-header .avatar-glow::before {
+    .sidebar-header .avatar-glow::after {
       content: '';
       position: absolute;
-      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
       border-radius: 50%;
-      border: 1.5px dashed var(--neon-cyan);
-      animation: rotate-dash 25s linear infinite;
+      border: 2px dashed var(--accent-light);
+      animation: rotate-dash 20s linear infinite;
     }
 
     @keyframes rotate-dash {
@@ -157,39 +117,33 @@
     }
 
     .sidebar-header h1 {
-      font-family: var(--font-cyber);
-      font-size: 20px;
+      font-family: var(--font-display);
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: 1px;
-      color: #fff;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.5px;
     }
 
     .sidebar-header p {
-      font-family: var(--font-cyber);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: var(--neon-cyan);
-      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .pulse-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--neon-green);
+      background: var(--success);
       display: inline-block;
-      box-shadow: 0 0 8px var(--neon-green);
-      animation: pulse-glow 2s infinite;
+      animation: pulse-green 2s infinite;
     }
 
-    @keyframes pulse-glow {
+    @keyframes pulse-green {
       0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
       100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
@@ -202,286 +156,239 @@
       gap: 24px;
     }
 
-    /* ── Cyber Info Card Styles ── */
-    .cyber-card {
-      background: rgba(139, 92, 246, 0.02);
-      border: 1px dashed rgba(139, 92, 246, 0.25);
+    /* Scrollbar Styling */
+    .sidebar-scroll::-webkit-scrollbar,
+    #chat-window::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-track,
+    #chat-window::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb,
+    #chat-window::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover,
+    #chat-window::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ── Sections inside Sidebar ── */
+    .info-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
       border-radius: 16px;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 16px;
+      transition: all 0.3s ease;
+      white-space: normal;
     }
-    .cyber-card:hover {
-      border-style: solid;
-      border-color: var(--neon-violet);
-      background: rgba(139, 92, 246, 0.04);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
-      transform: translateY(-2px);
+    .info-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Small decorative crosshair in cards */
-    .cyber-card::before {
-      content: '+';
-      position: absolute;
-      top: 6px; right: 8px;
-      font-family: var(--font-cyber);
-      font-size: 10px;
-      color: rgba(139, 92, 246, 0.5);
-    }
-
-    .card-title {
-      font-family: var(--font-cyber);
-      font-size: 12px;
+    .info-card-title {
+      font-family: var(--font-display);
+      font-size: 13px;
       font-weight: 700;
-      color: var(--neon-cyan);
+      color: var(--accent-light);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 16px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    /* Skill Orbit Visualization */
-    .skill-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    .skill-node {
-      background: rgba(10, 15, 35, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 4px;
-      text-align: center;
-      font-family: var(--font-cyber);
-      font-size: 9.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-    .skill-node:hover {
-      color: #fff;
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
-    }
-
-    /* Tech Project Modules */
-    .project-module {
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
-    }
-    .project-module:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-    .module-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .module-title {
-      font-family: var(--font-cyber);
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .module-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-    .stats-flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .stat-badge {
-      background: rgba(6, 182, 212, 0.08);
-      border: 1px solid rgba(6, 182, 212, 0.2);
-      color: var(--neon-cyan);
-      font-family: var(--font-cyber);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
-    }
-
-    /* Academics Stats Grid */
-    .academics-box {
+    /* Academics Info */
+    .academic-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-    .academic-stat {
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      padding: 10px;
-      border-radius: 10px;
-    }
-    .stat-lbl {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .stat-val {
-      font-family: var(--font-cyber);
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #fff;
-      margin-top: 2px;
-    }
-
-    /* Certifications List */
-    .certs-wrapper {
+    .academic-item {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 2px;
     }
-    .cert-row {
-      background: rgba(16, 185, 129, 0.04);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      border-radius: 8px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      color: #e6f7ed;
+    .academic-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
     }
-    .cert-row svg {
-      color: var(--neon-green);
-      flex-shrink: 0;
+    .academic-value {
+      font-size: 13.5px;
+      font-weight: 600;
     }
 
-    /* ── Right Section (AI Hologram Chat & Controller) ── */
+    /* Collapsible Project Sections */
+    .project-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+    .project-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    .project-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .project-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .metric-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .metric-pill {
+      background: rgba(124, 58, 237, 0.12);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      color: var(--accent-light);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* Badges List */
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .cert-badge {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Right Content Window (Chat & Voice Controls) ── */
     .chat-section {
       flex: 1;
       display: flex;
       flex-direction: column;
       height: 100%;
       position: relative;
-      background: rgba(3, 6, 20, 0.2);
     }
 
-    /* Cyber Action Header Bar */
+    /* Top Action Bar */
     .action-bar {
-      padding: 24px 30px;
-      border-bottom: 2px solid var(--border);
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--glass-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(4, 7, 20, 0.4);
-      backdrop-filter: blur(15px);
+      background: rgba(10, 12, 26, 0.2);
+      backdrop-filter: blur(10px);
       z-index: 10;
     }
 
-    .action-bar-info h2 {
-      font-family: var(--font-cyber);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #fff;
-    }
-    .action-bar-info p {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-
-    /* Floating Voice Command Sphere & Control */
     .voice-control-group {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
 
+    /* Modern Call Button */
     #vapi-call-btn {
-      background: linear-gradient(135deg, var(--neon-green), #059669);
+      background: var(--success);
       color: #fff;
       border: none;
-      font-family: var(--font-cyber);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 12px 22px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
       border-radius: 50px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
     }
     #vapi-call-btn:hover {
-      transform: translateY(-2px) scale(1.03);
+      transform: translateY(-2px);
       box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+      filter: brightness(1.05);
     }
     #vapi-call-btn:active {
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
     }
 
-    /* Soundwave Wave Sphere */
-    .hologram-visualizer {
+    /* Soundwave Visualizer Canvas */
+    .visualizer-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 4px;
-      height: 30px;
-      width: 70px;
+      gap: 3px;
+      height: 24px;
+      width: 80px;
       opacity: 0;
       visibility: hidden;
       transition: all 0.3s ease;
     }
-    .hologram-visualizer.active {
+    .visualizer-container.active {
       opacity: 1;
       visibility: visible;
     }
-    .visualizer-bar {
+    .wave-bar {
       width: 3px;
       height: 4px;
-      background: linear-gradient(to top, var(--neon-cyan), var(--neon-violet));
-      border-radius: 2px;
-      animation: audio-bounce 1s ease-in-out infinite alternate;
-      box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+      background: var(--success);
+      border-radius: 3px;
+      animation: wave-animation 1s ease-in-out infinite alternate;
     }
-    .visualizer-bar:nth-child(2) { animation-delay: 0.15s; }
-    .visualizer-bar:nth-child(3) { animation-delay: 0.3s; }
-    .visualizer-bar:nth-child(4) { animation-delay: 0.45s; }
-    .visualizer-bar:nth-child(5) { animation-delay: 0.6s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
 
-    @keyframes audio-bounce {
+    @keyframes wave-animation {
       0% { height: 4px; }
-      100% { height: 28px; }
+      100% { height: 24px; }
     }
 
-    /* ── Chat Messages Stream Window ── */
+    /* ── Chat Messages Pane ── */
     #chat-window {
       flex: 1;
       overflow-y: auto;
-      padding: 30px;
+      padding: 28px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 20px;
       scroll-behavior: smooth;
     }
 
     .message {
       display: flex;
-      gap: 16px;
-      max-width: 82%;
+      gap: 14px;
+      max-width: 80%;
       opacity: 0;
-      transform: translateY(12px);
-      animation: message-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transform: translateY(10px);
+      animation: show-msg 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    @keyframes message-slide-in {
+    @keyframes show-msg {
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -489,317 +396,279 @@
       align-self: flex-end;
       flex-direction: row-reverse;
     }
+
     .message.assistant {
       align-self: flex-start;
     }
 
     .msg-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
       flex-shrink: 0;
-      font-family: var(--font-cyber);
+      font-family: var(--font-display);
       font-weight: 700;
-      position: relative;
     }
 
     .message.user .msg-icon {
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid var(--neon-cyan);
-      color: var(--neon-cyan);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
     }
 
     .message.assistant .msg-icon {
-      background: rgba(139, 92, 246, 0.1);
-      border: 1px solid var(--neon-violet);
-      color: var(--neon-violet);
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #fff;
+      box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .bubble {
-      padding: 16px 20px;
-      border-radius: 20px;
+      padding: 14px 18px;
+      border-radius: 18px;
       line-height: 1.6;
       font-size: 14.5px;
       word-wrap: break-word;
-      position: relative;
     }
 
     .message.user .bubble {
-      background: rgba(6, 182, 212, 0.06);
-      border: 1px solid rgba(6, 182, 212, 0.25);
+      background: var(--user-bubble);
+      border: 1px solid rgba(124, 58, 237, 0.25);
       border-top-right-radius: 4px;
-      color: #e0f2fe;
+      color: #f3e8ff;
     }
 
     .message.assistant .bubble {
-      background: rgba(139, 92, 246, 0.04);
-      border: 1px solid rgba(139, 92, 246, 0.2);
+      background: var(--ai-bubble);
+      border: 1px solid var(--glass-border);
       border-top-left-radius: 4px;
-      box-shadow: inset 0 0 15px rgba(139, 92, 246, 0.02);
     }
 
-    /* Source Tags */
-    .source-tag-wrapper {
+    .source-tag-container {
       display: flex;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 6px;
       flex-wrap: wrap;
     }
+
     .source-tag {
-      font-family: var(--font-cyber);
-      font-size: 9px;
+      font-size: 10px;
       text-transform: uppercase;
-      font-weight: 700;
-      color: var(--neon-cyan);
-      background: rgba(6, 182, 212, 0.05);
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(6, 182, 212, 0.15);
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--glass-border);
     }
 
-    /* Typing indicators */
+    /* Typing Indicator bubble */
     .typing-indicator {
       display: none;
       align-self: flex-start;
-      gap: 16px;
-      max-width: 82%;
+      gap: 14px;
+      max-width: 80%;
     }
     .typing-indicator.visible {
       display: flex;
     }
 
-    .indicator-dots {
+    .dots {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 0;
+      gap: 5px;
+      padding: 6px 0;
     }
-    .indicator-dots span {
-      width: 8px;
-      height: 8px;
-      background: var(--neon-violet);
+    .dots span {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-light);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--neon-violet);
-      animation: dot-jump 1.3s infinite;
+      animation: bounce 1.3s infinite;
     }
-    .indicator-dots span:nth-child(2) { animation-delay: 0.15s; }
-    .indicator-dots span:nth-child(3) { animation-delay: 0.30s; }
+    .dots span:nth-child(2) { animation-delay: 0.15s; }
+    .dots span:nth-child(3) { animation-delay: 0.3s; }
 
-    @keyframes dot-jump {
+    @keyframes bounce {
       0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-7px); opacity: 1; }
+      30% { transform: translateY(-6px); opacity: 1; }
     }
 
-    /* ── Glowing Holographic Scheduling Node Grid ── */
-    .slots-grid {
+    /* ── Custom Inline Calendar Scheduling Card ── */
+    .slots-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
       width: 100%;
     }
-    .slot-node {
-      background: rgba(139, 92, 246, 0.03);
-      border: 1.5px solid rgba(139, 92, 246, 0.2);
-      color: #fff;
+    .slot-btn {
+      background: rgba(124, 58, 237, 0.06);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      color: var(--accent-light);
       border-radius: 12px;
-      padding: 12px;
-      font-family: var(--font-cyber);
-      font-size: 11px;
-      font-weight: 700;
+      padding: 12px 14px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
-      box-shadow: inset 0 0 8px rgba(139, 92, 246, 0.05);
     }
-    .slot-node:hover:not(:disabled) {
-      background: rgba(139, 92, 246, 0.12);
-      border-color: var(--neon-violet);
-      box-shadow: 
-        0 0 15px rgba(139, 92, 246, 0.25),
-        inset 0 0 10px rgba(139, 92, 246, 0.1);
+    .slot-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
-    .slot-node strong {
-      font-size: 12px;
-      color: var(--neon-cyan);
-    }
-    .slot-node:disabled {
-      opacity: 0.3;
+    .slot-btn:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
-      border-color: rgba(255, 255, 255, 0.04);
     }
 
-    /* Booking Confirmation Drawer Form */
-    .cyber-form {
-      background: rgba(10, 12, 26, 0.6);
-      border: 1px dashed rgba(6, 182, 212, 0.3);
+    /* Booking details overlay form */
+    .booking-form {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
       border-radius: 16px;
-      padding: 22px;
-      margin-top: 14px;
+      padding: 20px;
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      animation: message-slide-in 0.3s ease-out;
+      gap: 12px;
+      animation: show-msg 0.3s ease-out;
     }
 
-    .cyber-form p {
+    .booking-form p {
       font-size: 13px;
       color: var(--text-muted);
-      font-family: var(--font-body);
-    }
-    .cyber-form p strong {
-      color: var(--neon-cyan);
-      font-family: var(--font-cyber);
     }
 
-    .cyber-form input {
-      background: rgba(3, 5, 13, 0.8);
-      border: 1px solid var(--border);
+    .booking-form input {
+      background: rgba(10, 12, 26, 0.6);
+      border: 1px solid var(--glass-border);
       color: var(--text);
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 11px 14px;
       font-size: 14px;
       outline: none;
       transition: all 0.2s;
-      font-family: var(--font-body);
     }
-    .cyber-form input:focus {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+    .booking-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.2);
     }
 
-    .cyber-submit-btn {
-      background: linear-gradient(135deg, var(--neon-violet), #6d28d9);
+    .confirm-btn {
+      background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 10px;
-      padding: 14px;
-      font-family: var(--font-cyber);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
     }
-    .cyber-submit-btn:hover:not(:disabled) {
-      filter: brightness(1.1);
-      box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
+    .confirm-btn:hover:not(:disabled) {
+      background: var(--accent-light);
       transform: translateY(-1px);
     }
-    .cyber-submit-btn:disabled {
+    .confirm-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .cyber-confirmation-box {
+    .booking-confirmed {
       background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399;
       border-radius: 16px;
-      padding: 18px;
-      margin-top: 14px;
+      padding: 16px;
+      margin-top: 12px;
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.5;
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
-    }
-    .cyber-confirmation-box svg {
-      color: var(--neon-green);
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .cyber-confirmation-box strong {
-      color: #34d399;
-      font-family: var(--font-cyber);
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.5px;
+      gap: 10px;
     }
 
-    /* ── Bottom Entry Bar ── */
+    /* ── Bottom Text Input Bar ── */
     .bottom-bar {
-      padding: 24px 30px 28px;
+      padding: 20px 28px 24px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      background: rgba(4, 7, 20, 0.4);
-      border-top: 2px solid var(--border);
+      gap: 12px;
+      background: rgba(10, 12, 26, 0.2);
+      border-top: 1px solid var(--glass-border);
     }
 
-    /* Starter command tags */
+    /* Starter Prompts list */
     #starters {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    .starter-tag {
-      background: rgba(10, 15, 35, 0.6);
-      border: 1px dashed var(--border);
+    .starter {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
       color: var(--text-muted);
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-family: var(--font-cyber);
-      font-size: 11px;
-      font-weight: 600;
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .starter-tag:hover {
-      border-style: solid;
-      border-color: var(--neon-cyan);
-      color: #fff;
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+    .starter:hover {
+      background: rgba(124, 58, 237, 0.08);
+      border-color: var(--accent);
+      color: var(--text);
       transform: translateY(-1px);
     }
 
-    .input-panel {
+    .input-wrapper {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: flex-end;
     }
 
     #user-input {
       flex: 1;
-      background: rgba(3, 5, 13, 0.85);
-      border: 1px solid var(--border);
+      background: rgba(10, 12, 26, 0.6);
+      border: 1px solid var(--glass-border);
       color: var(--text);
       border-radius: 16px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       font-family: var(--font-body);
       font-size: 14.5px;
       resize: none;
       outline: none;
       line-height: 1.5;
-      max-height: 150px;
+      max-height: 140px;
       transition: all 0.2s;
     }
     #user-input:focus {
-      border-color: var(--neon-violet);
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.15);
     }
     #user-input::placeholder {
-      color: rgba(255, 255, 255, 0.2);
+      color: var(--text-dark);
     }
 
     #send-btn {
-      background: linear-gradient(135deg, var(--neon-violet), #6d28d9);
+      background: var(--accent);
       border: none;
       color: #fff;
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       border-radius: 16px;
       cursor: pointer;
       display: flex;
@@ -807,22 +676,21 @@
       justify-content: center;
       transition: all 0.2s;
       flex-shrink: 0;
-      box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 0 10px var(--accent-glow);
     }
     #send-btn:hover:not(:disabled) {
-      filter: brightness(1.1);
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+      background: var(--accent-light);
       transform: translateY(-1px);
     }
     #send-btn:disabled {
-      opacity: 0.3;
+      opacity: 0.4;
       cursor: not-allowed;
       box-shadow: none;
     }
 
     #send-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: currentColor;
       stroke-width: 2.5;
@@ -830,214 +698,184 @@
       stroke-linejoin: round;
     }
 
-    /* ── Responsive Mobile Formatting ── */
-    @media (max-width: 950px) {
+    /* ── Responsive Mobile Optimization ── */
+    @media (max-width: 900px) {
       body {
         padding: 0;
-        overflow-y: auto;
-        height: auto;
       }
-      .command-panel {
+      .app-container {
         border-radius: 0;
         border: none;
         flex-direction: column;
-        height: auto;
-        min-height: 100vh;
       }
-      .hologram-sidebar {
+      .sidebar {
         width: 100%;
         height: auto;
-        max-height: none;
+        max-height: 260px;
         border-right: none;
-        border-bottom: 2px solid var(--border);
+        border-bottom: 1px solid var(--glass-border);
       }
       .sidebar-scroll {
-        flex-direction: column;
-        overflow-y: visible;
-        overflow-x: hidden;
-        white-space: normal;
-        padding: 20px;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        padding: 16px;
         gap: 16px;
-        height: auto;
+        height: 120px;
       }
-      .cyber-card {
-        display: block;
-        width: 100%;
-        min-width: 0;
-        white-space: normal;
+      .info-card {
+        display: inline-block;
+        min-width: 260px;
+        vertical-align: top;
       }
       .sidebar-header {
-        padding: 16px 20px;
-      }
-      .chat-section {
-        height: 650px;
+        padding: 16px;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="command-panel">
-  <!-- Corner Highlights -->
-  <div class="panel-corner corner-tl"></div>
-  <div class="panel-corner corner-tr"></div>
-  <div class="panel-corner corner-bl"></div>
-  <div class="panel-corner corner-br"></div>
+<div class="app-container">
   
-  <!-- ── HOLOGRAM SIDEBAR (CORE RECORDS) ── -->
-  <aside class="hologram-sidebar">
+  <!-- ── SIDEBAR DASHBOARD ── -->
+  <aside class="sidebar">
     <div class="sidebar-header">
       <div class="avatar-glow">T</div>
       <div>
         <h1>Taal Chawla</h1>
-        <p><span class="pulse-dot"></span>AI Core Online</p>
+        <p><span class="pulse-dot"></span>AI Representative</p>
       </div>
     </div>
     
     <div class="sidebar-scroll">
       
-      <!-- Academic Records -->
-      <div class="cyber-card">
-        <div class="card-title">📊 Profile Overview</div>
-        <div class="academics-box">
-          <div class="academic-stat">
-            <div class="stat-lbl">Institution</div>
-            <div class="stat-val" title="Maharaja Agrasen Institute of Technology">MAIT, Delhi</div>
+      <!-- Academic Profile -->
+      <div class="info-card">
+        <div class="info-card-title">🎓 Education</div>
+        <div class="academic-grid">
+          <div class="academic-item">
+            <span class="academic-label">University</span>
+            <span class="academic-value" title="Maharaja Agrasen Institute of Technology">MAIT, GGSIPU</span>
           </div>
-          <div class="academic-stat">
-            <div class="stat-lbl">Major</div>
-            <div class="stat-val">B.Tech ECE</div>
+          <div class="academic-item">
+            <span class="academic-label">Degree</span>
+            <span class="academic-value">B.Tech ECE (AI/ML)</span>
           </div>
-          <div class="academic-stat" style="margin-top: 8px;">
-            <div class="stat-lbl">GPA Score</div>
-            <div class="stat-val">8.32 / 10</div>
+          <div class="academic-item" style="margin-top: 8px;">
+            <span class="academic-label">CGPA</span>
+            <span class="academic-value">8.32 / 10</span>
           </div>
-          <div class="academic-stat" style="margin-top: 8px;">
-            <div class="stat-lbl">Grad Year</div>
-            <div class="stat-val">May 2027</div>
+          <div class="academic-item" style="margin-top: 8px;">
+            <span class="academic-label">Graduation</span>
+            <span class="academic-value">May 2027</span>
           </div>
         </div>
       </div>
       
-      <!-- Technical Skills Matrix -->
-      <div class="cyber-card">
-        <div class="card-title">⚙️ Skill Matrix</div>
-        <div class="skill-grid">
-          <div class="skill-node">RAG Systems</div>
-          <div class="skill-node">LangGraph</div>
-          <div class="skill-node">Fine-Tuning</div>
-          <div class="skill-node">Pinecone</div>
-          <div class="skill-node">PyTorch</div>
-          <div class="skill-node">Docker</div>
-        </div>
-      </div>
-      
-      <!-- Operational Projects -->
-      <div class="cyber-card">
-        <div class="card-title">💾 System Projects</div>
+      <!-- Project Metrics -->
+      <div class="info-card">
+        <div class="info-card-title">🚀 Core Projects</div>
         
-        <div class="project-module">
-          <div class="module-header">
-            <div class="module-title">NexusOps</div>
-          </div>
-          <div class="module-desc">Autonomous Kubernetes orchestrator engine featuring human-in-the-loop gating.</div>
-          <div class="stats-flex">
-            <span class="stat-badge">20x Latency reduction</span>
-            <span class="stat-badge">0.95 RAGAS Score</span>
-            <span class="stat-badge">LangGraph Gated</span>
+        <div class="project-item">
+          <div class="project-title">NexusOps</div>
+          <div class="project-desc">Autonomous Kubernetes agentic workflow engine featuring Human-in-the-loop gating.</div>
+          <div class="metric-pill-container">
+            <span class="metric-pill">20x Latency (12ms)</span>
+            <span class="metric-pill">0.95 RAGAS</span>
+            <span class="metric-pill">LangGraph HITL</span>
           </div>
         </div>
         
-        <div class="project-module" style="border-bottom:none; padding-bottom:0; margin-bottom:0;">
-          <div class="module-header">
-            <div class="module-title">Neuro-Confidence</div>
-          </div>
-          <div class="module-desc">Uncertainty quantification models built for clinical brain tumor classifications.</div>
-          <div class="stats-flex">
-            <span class="stat-badge">ECE: 0.124 to 0.031</span>
-            <span class="stat-badge">2.78% Hallucination</span>
-            <span class="stat-badge">Patient Split</span>
+        <div class="project-item" style="border-bottom:none; padding-bottom:0; margin-bottom:0;">
+          <div class="project-title">Brain Tumor Classification</div>
+          <div class="project-desc">Uncertainty quantification models built for clinical brain tumor classification tasks.</div>
+          <div class="metric-pill-container">
+            <span class="metric-pill">ECE: 0.124 to 0.031</span>
+            <span class="metric-pill">2.78% Hallucination</span>
+            <span class="metric-pill">Patient-wise Split</span>
           </div>
         </div>
       </div>
       
-      <!-- Qualifications -->
-      <div class="cyber-card">
-        <div class="card-title">🎖️ Certifications</div>
-        <div class="certs-wrapper">
-          <div class="cert-row">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            Anthropic Model Context Protocol (2026)
+      <!-- Certifications -->
+      <div class="info-card">
+        <div class="info-card-title">📜 Certifications</div>
+        <div class="badge-list">
+          <div class="cert-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Anthropic MCP (2026)
           </div>
-          <div class="cert-row">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            HuggingFace Fine Tuning a Pretrained Model
+          <div class="cert-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            HuggingFace Fine-Tuning
           </div>
         </div>
       </div>
       
-      <!-- Research tenure -->
-      <div class="cyber-card">
-        <div class="card-title">🔬 DRDO Research</div>
-        <div class="module-title" style="font-size:12px; color:#fff;">Solid State Physics Laboratory</div>
-        <div class="module-desc" style="margin-top: 4px;">Completed an 8-week research internship studying Silicon Carbide Polytypes using Raman Spectroscopy and signal analysis.</div>
+      <!-- Research & Experience -->
+      <div class="info-card">
+        <div class="info-card-title">🔬 Internship</div>
+        <div class="project-title">DRDO Research Intern</div>
+        <div class="project-desc" style="margin-top: 4px;">8-week research tenure at Solid State Physics Laboratory (SSPL), DRDO. Synthesized Raman Spectroscopy and signal analysis to study Silicon Carbide Polytypes.</div>
       </div>
 
     </div>
   </aside>
   
-  <!-- ── AI COMMAND TERMINAL ── -->
+  <!-- ── MAIN CHAT & VOICE INTERFACE ── -->
   <main class="chat-section">
     
-    <!-- Top Action Console Bar -->
+    <!-- Action Bar / Header -->
     <div class="action-bar">
-      <div class="action-bar-info">
-        <h2>Cognitive System Controller</h2>
-        <p>Grounded via Pinecone DB Vector Retrieval & GitHub Telemetry</p>
+      <div>
+        <div style="font-size: 15px; font-weight: 600;">System Grounding Desk</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Fully RAG-grounded with source mapping</div>
       </div>
       <div class="voice-control-group">
-        <!-- Shifting Hologram Visualizer waves -->
-        <div class="hologram-visualizer" id="visualizer">
-          <div class="visualizer-bar"></div>
-          <div class="visualizer-bar"></div>
-          <div class="visualizer-bar"></div>
-          <div class="visualizer-bar"></div>
-          <div class="visualizer-bar"></div>
+        <!-- Soundwave visualizer bars -->
+        <div class="visualizer-container" id="visualizer">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
         </div>
-        <!-- Vapi Activation Trigger Button -->
+        <!-- Vapi Trigger Button -->
         <button id="vapi-call-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-          Initialize Voice Agent
+          Talk to Agent
         </button>
       </div>
     </div>
     
-    <!-- Chat stream -->
+    <!-- Chat window -->
     <div id="chat-window"></div>
     
-    <!-- Typing indicator bubble -->
+    <!-- Typing indicator -->
     <div class="typing-indicator" id="typing">
       <div class="msg-icon">T</div>
       <div>
         <div class="bubble">
-          <div class="indicator-dots"><span></span><span></span><span></span></div>
+          <div class="dots"><span></span><span></span><span></span></div>
         </div>
       </div>
     </div>
     
-    <!-- Bottom command entry -->
+    <!-- Bottom Entry Area -->
     <div class="bottom-bar">
-      <!-- Cyber quick command tags -->
+      <!-- Starter prompts -->
       <div id="starters">
-        <button class="starter-tag" onclick="sendStarter(this)">SYS://Why hire Taal?</button>
-        <button class="starter-tag" onclick="sendStarter(this)">SYS://Tell me about NexusOps</button>
-        <button class="starter-tag" onclick="sendStarter(this)">SYS://What are her project metrics?</button>
-        <button class="starter-tag" onclick="sendStarter(this)">SYS://Schedule a meeting</button>
+        <button class="starter" onclick="sendStarter(this)">Why hire Taal?</button>
+        <button class="starter" onclick="sendStarter(this)">Tell me about NexusOps</button>
+        <button class="starter" onclick="sendStarter(this)">What are her calibration metrics?</button>
+        <button class="starter" onclick="sendStarter(this)">Schedule a meeting</button>
       </div>
       
-      <div class="input-panel">
-        <textarea id="user-input" rows="1" placeholder="Enter query parameters for Taal Chawla AI representative..."></textarea>
-        <button id="send-btn" onclick="sendMessage()" title="Execute Command">
+      <div class="input-wrapper">
+        <textarea id="user-input" rows="1" placeholder="Ask anything about Taal's work..."></textarea>
+        <button id="send-btn" onclick="sendMessage()" title="Send Message">
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
@@ -1048,6 +886,7 @@
 
 <!-- Vapi Web SDK (v2.x) -->
 <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.5.2/dist/vapi.min.js"></script>
+
 <script>
   const API_BASE = window.location.origin;
   const chatWindow = document.getElementById("chat-window");
@@ -1064,6 +903,9 @@
 
   // ── VAPI Voice Agent Setup ──
   const VAPI_PUBLIC_KEY = 'c476ff04-a3e4-433b-b28e-c829c94f9c6d'; 
+  
+  // CRITICAL: Replace this with your exact Vapi Assistant ID from the dashboard.
+  // If left as a placeholder or empty, it will fall back to using your configured phone call/assistant link.
   const VAPI_ASSISTANT_ID = '331826b1-6a2c-473d-82d2-850f142b7803'; 
 
   let vapi = null;
@@ -1071,32 +913,32 @@
     const VapiClass = window.Vapi?.default || window.Vapi;
     if (VapiClass) {
       vapi = new VapiClass(VAPI_PUBLIC_KEY);
-      
-      // Register WebRTC call events
-      vapi.on('call-start', () => {
-        console.log("WebRTC voice session connected.");
-        voiceCallBtn.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>
-          Disconnect Call`;
-        voiceCallBtn.style.background = "linear-gradient(135deg, var(--neon-red), #be123c)";
-        voiceCallBtn.style.boxShadow = "0 0 15px rgba(244, 63, 94, 0.4)";
-        visualizer.classList.add("active");
-        isVoiceActive = true;
-      });
-
-      vapi.on('call-end', () => {
-        console.log("WebRTC voice session disconnected.");
-        resetVoiceUI();
-      });
-
-      vapi.on('error', (err) => {
-        console.error("Vapi Connection Error:", err);
-        alert("Microphone connection failed. Please ensure browser mic permissions are enabled.");
-        resetVoiceUI();
-      });
     } else {
       console.warn("Vapi global class not found in window object.");
     }
+    
+    // Register SDK call events
+    vapi.on('call-start', () => {
+      console.log("WebRTC voice session connected.");
+      voiceCallBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>
+        End Voice Call`;
+      voiceCallBtn.style.background = "var(--danger)";
+      voiceCallBtn.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)";
+      visualizer.classList.add("active");
+      isVoiceActive = true;
+    });
+
+    vapi.on('call-end', () => {
+      console.log("WebRTC voice session disconnected.");
+      resetVoiceUI();
+    });
+
+    vapi.on('error', (err) => {
+      console.error("Vapi Connection Error:", err);
+      alert("Microphone connection failed. Please ensure mic access permissions are granted to the browser.");
+      resetVoiceUI();
+    });
   } catch (err) {
     console.error("Vapi initialization failed:", err);
   }
@@ -1104,36 +946,40 @@
   function resetVoiceUI() {
     voiceCallBtn.innerHTML = `
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-      Initialize Voice Agent`;
-    voiceCallBtn.style.background = "linear-gradient(135deg, var(--neon-green), #059669)";
+      Talk to Agent`;
+    voiceCallBtn.style.background = "var(--success)";
     voiceCallBtn.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.3)";
     visualizer.classList.remove("active");
     isVoiceActive = false;
   }
 
-  function handleVoiceClick() {
+  voiceCallBtn.addEventListener('click', () => {
     if (!vapi) {
-      alert("Vapi SDK library failed to initialize.");
+      alert("Vapi library is not initialized.");
       return;
     }
     
     if (!isVoiceActive) {
       if (!VAPI_ASSISTANT_ID || VAPI_ASSISTANT_ID === 'YOUR_VAPI_ASSISTANT_ID_HERE') {
-        const devId = prompt("Enter your Vapi Assistant UUID:", "");
-        if (devId) vapi.start(devId.trim());
+        // Fallback placeholder warning
+        const devId = prompt("Vapi Assistant ID is missing. Please enter your Vapi Assistant UUID to call directly, or set VAPI_ASSISTANT_ID in index.html:", "");
+        if (devId) {
+          vapi.start(devId.trim());
+        }
       } else {
         vapi.start(VAPI_ASSISTANT_ID);
       }
     } else {
       vapi.stop();
     }
-  }
+  });
 
-  // ── Chat Console Script Logic ──
+
+  // ── Chat Engine Logic ──
 
   input.addEventListener("input", () => {
     input.style.height = "auto";
-    input.style.height = Math.min(input.scrollHeight, 150) + "px";
+    input.style.height = Math.min(input.scrollHeight, 140) + "px";
   });
 
   input.addEventListener("keydown", (e) => {
@@ -1144,7 +990,7 @@
   });
 
   function sendStarter(btn) {
-    input.value = btn.textContent.replace("SYS://", "");
+    input.value = btn.textContent;
     starters.style.display = "none";
     sendMessage();
   }
@@ -1152,13 +998,13 @@
   function appendMessage(role, content, extraHtml = "", sources = []) {
     const div = document.createElement("div");
     div.className = `message ${role}`;
-    const icon = role === "user" ? "USR" : "SYS";
+    const icon = role === "user" ? "👤" : "T";
     
     let sourceBadges = "";
     if (sources && sources.length > 0) {
       sourceBadges = `
-        <div class="source-tag-wrapper">
-          ${sources.map(s => `<span class="source-tag">source::${s}</span>`).join("")}
+        <div class="source-tag-container">
+          ${sources.map(s => `<span class="source-tag">source: ${s}</span>`).join("")}
         </div>`;
     }
 
@@ -1210,7 +1056,7 @@
     } catch (err) {
       console.error(err);
       hideTyping();
-      appendMessage("assistant", "CRITICAL ERROR: Connection pipeline failure. Check server telemetry.");
+      appendMessage("assistant", "I ran into a connection issue. Please verify the server is running and try again.");
     }
 
     sendBtn.disabled = false;
@@ -1224,12 +1070,13 @@
     });
     const data = await res.json();
     hideTyping();
-    const reply = data.response || "No response packages returned.";
+    const reply = data.response || "I couldn't generate a response. Please check backend configs.";
     appendMessage("assistant", escapeHtml(reply), "", data.sources_used);
     conversationHistory.push({ role: "assistant", content: reply });
   }
 
   async function handleBookingFlow(text) {
+    // Call chat to get grounded answer text
     const chatRes = await fetch(`${API_BASE}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1238,6 +1085,7 @@
     const chatData = await chatRes.json();
     const reply = chatData.response || "";
 
+    // Call calendar availability
     const slotsRes = await fetch(`${API_BASE}/check-availability`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1247,15 +1095,15 @@
     hideTyping();
 
     if (!slotsData.slots || slotsData.slots.length === 0) {
-      appendMessage("assistant", escapeHtml(reply) + "\n\n(No open slots found on Taal's calendar at this time.)", "", chatData.sources_used);
+      appendMessage("assistant", escapeHtml(reply) + "\n\n(I couldn't locate any free slots on Taal's calendar at the moment. Please contact her directly.)", "", chatData.sources_used);
       return;
     }
 
     const slotsHtml = `
-      <div class="slots-grid">
+      <div class="slots-container">
         ${slotsData.slots.map(s =>
-          `<button class="slot-node" onclick="selectSlot('${s.start}', '${escapeHtml(s.display)}', this)">
-            <span>NODE_ALLOC</span>
+          `<button class="slot-btn" onclick="selectSlot('${s.start}', '${escapeHtml(s.display)}', this)">
+            <span>Time Slot</span>
             <strong>${s.display}</strong>
           </button>`
         ).join("")}
@@ -1267,22 +1115,24 @@
   function selectSlot(isoStart, displayTime, btn) {
     pendingSlotStart = isoStart;
     
-    document.querySelectorAll(".slot-node").forEach(b => b.disabled = true);
+    // Disable other slots, highlight chosen
+    document.querySelectorAll(".slot-btn").forEach(b => b.disabled = true);
     btn.disabled = false;
-    btn.style.background = "rgba(139, 92, 246, 0.15)";
-    btn.style.borderColor = "var(--neon-violet)";
-    btn.style.boxShadow = "0 0 10px rgba(139, 92, 246, 0.3)";
+    btn.style.background = "var(--accent)";
+    btn.style.borderColor = "var(--accent)";
+    btn.style.color = "#fff";
 
-    const oldForm = document.querySelector(".cyber-form");
+    // Remove existing booking forms if any
+    const oldForm = document.querySelector(".booking-form");
     if (oldForm) oldForm.remove();
 
     const formDiv = document.createElement("div");
-    formDiv.className = "cyber-form";
+    formDiv.className = "booking-form";
     formDiv.innerHTML = `
-      <p>Allocating time node: <strong>${displayTime}</strong>. Provide routing details:</p>
-      <input id="booking-name" type="text" placeholder="Attendee Name" required />
-      <input id="booking-email" type="email" placeholder="Attendee Email Address" required />
-      <button class="cyber-submit-btn" id="confirm-btn" onclick="confirmBooking()">Execute Booking</button>`;
+      <p>Booking interview call for slot: <strong>${displayTime}</strong>. Please enter details:</p>
+      <input id="booking-name" type="text" placeholder="Full Name" required />
+      <input id="booking-email" type="email" placeholder="Email Address" required />
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmBooking()">Confirm Meeting</button>`;
       
     btn.parentNode.parentNode.appendChild(formDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -1295,13 +1145,13 @@
     const email = emailInput.value.trim();
     
     if (!name || !email) {
-      alert("Provide both name and email credentials.");
+      alert("Please provide both name and email fields.");
       return;
     }
 
     const confirmBtn = document.getElementById("confirm-btn");
     confirmBtn.disabled = true;
-    confirmBtn.textContent = "TRANSMITTING DATA...";
+    confirmBtn.textContent = "Locking in slot...";
 
     try {
       const res = await fetch(`${API_BASE}/book-slot`, {
@@ -1316,28 +1166,28 @@
       });
       const data = await res.json();
       
-      const form = document.querySelector(".cyber-form");
+      const form = document.querySelector(".booking-form");
       const slotsContainer = form.previousElementSibling;
       form.remove();
       slotsContainer.remove();
 
       if (data.confirmed) {
         const confirmDiv = document.createElement("div");
-        confirmDiv.className = "cyber-confirmation-box";
+        confirmDiv.className = "booking-confirmed";
         confirmDiv.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:2px; flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           <div>
-            <strong>TRANSMISSION COMPLETE</strong><br>
+            <strong>Booking Confirmed!</strong><br>
             ${escapeHtml(data.confirmation_message)}
           </div>`;
         chatWindow.appendChild(confirmDiv);
         conversationHistory.push({ role: "assistant", content: data.confirmation_message });
       } else {
-        appendMessage("assistant", "TRANS_REJ: Server rejected allocation. Please select another node.");
+        appendMessage("assistant", "The booking request was rejected by the server. Please reload and select a different slot.");
       }
     } catch (err) {
       console.error(err);
-      appendMessage("assistant", "TRANS_FAIL: Calendar interface unresponsive.");
+      appendMessage("assistant", "Calendar integration failed. Please contact Taal directly.");
     }
 
     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -1353,17 +1203,9 @@
       .replace(/\n/g, "<br>");
   }
 
-  // ── Window-Level Exports for Inline HTML Event Triggers ──
-  window.sendMessage = sendMessage;
-  window.sendStarter = sendStarter;
-  window.selectSlot = selectSlot;
-  window.confirmBooking = confirmBooking;
-
-  voiceCallBtn.addEventListener('click', handleVoiceClick);
-
   window.addEventListener("DOMContentLoaded", () => {
     appendMessage("assistant",
-      "CORE INTERFACE ENGAGED. I am the cognitive representative agent for Taal Chawla. Provide query inputs on her ML system studies, RAG operations, or schedule an operational meeting slot."
+      "Hello! I am Taal Chawla's AI representative. I can answer questions about her research in ML system calibration, RAG architecture for her NexusOps orchestration engine, or help you book an interview slot on her calendar. What would you like to discuss today?"
     );
   });
 </script>
