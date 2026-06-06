@@ -407,7 +407,7 @@
     appendMessage("user", escapeHtml(text));
     conversationHistory.push({ role: "user", content: text });
     showTyping();
-    const wantsBooking = ["schedule","book","call","meeting","available","availability","slot"].some(k => text.toLowerCase().includes(k));
+    const wantsBooking = ["schedule","book","call","meeting","available","availability","slot","10th","11th","12th","13th","14th","15th","16th","17th","18th","19th","20th","monday","tuesday","wednesday","thursday","friday","saturday","sunday","tomorrow","today","next week","interview","catch up","connect"].some(k => text.toLowerCase().includes(k));
     try {
       if (wantsBooking) await handleBookingFlow(text);
       else await handleChat(text);
@@ -495,42 +495,65 @@
 
 <!-- Vapi voice — ES module, loaded separately after DOM is ready -->
 <script type="module">
-  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.mjs";
-  console.log("Vapi loaded");
-  console.log(Vapi);
+  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.mjs";
 
-  const VAPI_PUBLIC_KEY = "f1c0ccba-2bec-402e-900d-56c729917e76";
-  const VAPI_ASSISTANT_ID = "a411f750-584b-4c68-9e26-2b291eb58754";
+  const VAPI_PUBLIC_KEY   = "f1c0ccba-2bec-402e-900d-56c729917e76";
+  const VAPI_ASSISTANT_ID = "aa411f750-584b-4c68-9e26-2b291eb58754";
 
   const btn        = document.getElementById("vapi-call-btn");
   const visualizer = document.getElementById("visualizer");
   let active = false;
+  let vapi = null;
 
-  const vapi = new Vapi(VAPI_PUBLIC_KEY);
+  // Show loading state while SDK initializes
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
 
-  vapi.on("call-start", () => {
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> End Call`;
-    btn.style.background   = "var(--danger)";
-    btn.style.boxShadow    = "0 0 15px rgba(239,68,68,0.4)";
-    visualizer.classList.add("active");
-    active = true;
-  });
+  try {
+    vapi = new Vapi(VAPI_PUBLIC_KEY);
 
-  vapi.on("call-end", reset);
-  vapi.on("error", (e) => { console.error("Vapi:", e); reset(); });
+    vapi.on("call-start", () => {
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> End Call`;
+      btn.style.background = "var(--danger)";
+      btn.style.boxShadow  = "0 0 15px rgba(239,68,68,0.4)";
+      btn.style.opacity    = "1";
+      visualizer.classList.add("active");
+      active = true;
+    });
+
+    vapi.on("call-end", reset);
+    vapi.on("error", (e) => { console.error("Vapi error:", e); reset(); });
+
+    // SDK ready — enable the button
+    btn.disabled = false;
+    btn.style.opacity = "1";
+
+    btn.addEventListener("click", () => {
+      if (active) {
+        vapi.stop();
+      } else {
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg> Connecting...`;
+        btn.disabled = true;
+        vapi.start(VAPI_ASSISTANT_ID);
+      }
+    });
+
+  } catch (e) {
+    console.error("Vapi init failed:", e);
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.addEventListener("click", () => alert("Voice agent unavailable. Call the Twilio number directly."));
+  }
 
   function reset() {
     btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Talk to Agent`;
     btn.style.background = "var(--success)";
     btn.style.boxShadow  = "0 0 15px rgba(16,185,129,0.3)";
+    btn.style.opacity    = "1";
+    btn.disabled = false;
     visualizer.classList.remove("active");
     active = false;
   }
-
-  btn.addEventListener("click", () => {
-    console.log("Button clicked");
-    active ? vapi.stop() : vapi.start(VAPI_ASSISTANT_ID);
-  });
 </script>
 </body>
 </html>
