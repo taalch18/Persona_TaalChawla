@@ -3,609 +3,1209 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taal Chawla — AI Systems Dashboard</title>
+  <title>Taal Chawla — AI Representative</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
+    /* ── Design Tokens & Base Styles ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    
     :root {
-      --bg: #0a0c10;
-      --holo-glow: #6c63ff;
-      --holo-cyan: #00f2fe;
-      --surface: rgba(26, 29, 39, 0.65);
-      --surface2: rgba(34, 38, 58, 0.45);
-      --border: rgba(108, 99, 255, 0.25);
-      --border-glowing: rgba(0, 242, 254, 0.6);
-      --accent: #6c63ff;
+      --bg: #060813;
+      --glass: rgba(13, 17, 34, 0.75);
+      --glass-hover: rgba(22, 28, 54, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-glow: rgba(124, 58, 237, 0.35);
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.5);
       --accent-light: #a78bfa;
-      --user-bubble: rgba(42, 45, 69, 0.8);
-      --ai-bubble: rgba(15, 17, 26, 0.85);
-      --text: #e8eaf6;
-      --text-muted: #8b90a8;
-      --success: #00f2fe;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dark: #6b7280;
+      --user-bubble: #1e1b4b;
+      --ai-bubble: #0f172a;
+      --success: #10b981;
       --danger: #ef4444;
-      --radius: 12px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --warning: #f59e0b;
+      --sidebar-width: 380px;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      font-family: var(--font);
-      background: var(--bg);
-      /* Cyberpunk background grid pattern */
+      font-family: var(--font-body);
+      background-color: var(--bg);
       background-image: 
-        linear-gradient(rgba(108, 99, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(108, 99, 255, 0.03) 1px, transparent 1px);
-      background-size: 30px 30px;
+        radial-gradient(at 10% 20%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
       color: var(--text);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── Holographic Frosted Glass Container ── */
-    .dashboard-wrapper {
-      width: 100%;
-      max-width: 760px;
-      display: flex;
-      flex-direction: column;
+      height: 100vh;
       height: 100dvh;
-      background: rgba(10, 12, 16, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-left: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      box-shadow: 0 0 40px rgba(108, 99, 255, 0.05);
-    }
-
-    /* ── Header ── */
-    header {
-      width: 100%;
-      padding: 20px;
-      border-bottom: 1px solid var(--border);
+      overflow: hidden;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 14px;
-      background: rgba(26, 29, 39, 0.4);
+      padding: 20px;
     }
 
-    .avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--holo-cyan));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-      box-shadow: 0 0 15px rgba(108, 99, 255, 0.4);
+    /* ── Main Container (Glassmorphic Window) ── */
+    .app-container {
+      width: 100%;
+      max-width: 1280px;
+      height: 100%;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       position: relative;
     }
-    .avatar::after {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--holo-cyan));
-      z-index: -1;
-      filter: blur(4px);
-      opacity: 0.7;
+
+    /* ── Left Sidebar (Dashboard) ── */
+    .sidebar {
+      width: var(--sidebar-width);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: rgba(10, 12, 26, 0.4);
+      flex-shrink: 0;
     }
 
-    .header-text h1 { 
-      font-size: 16px; 
-      font-weight: 600; 
-      letter-spacing: 0.5px;
-      text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-    }
-    .header-text p  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-
-    .header-actions {
-      margin-left: auto;
+    .sidebar-header {
+      padding: 28px;
+      border-bottom: 1px solid var(--glass-border);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 16px;
     }
 
-    /* ── Holographic Call Toggle ── */
-    #vapi-call-btn {
-      background: transparent;
-      color: var(--holo-cyan);
-      border: 1px solid var(--holo-cyan);
+    .sidebar-header .avatar-glow {
+      position: relative;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .sidebar-header .avatar-glow::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%;
+      border: 2px dashed var(--accent-light);
+      animation: rotate-dash 20s linear infinite;
+    }
+
+    @keyframes rotate-dash {
+      to { transform: rotate(360deg); }
+    }
+
+    .sidebar-header h1 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-header p {
       font-size: 12px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 20px;
-      cursor: pointer;
+      color: var(--text-muted);
+      margin-top: 2px;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.25s ease;
-      letter-spacing: 0.5px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Scrollbar Styling */
+    .sidebar-scroll::-webkit-scrollbar,
+    #chat-window::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-track,
+    #chat-window::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb,
+    #chat-window::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover,
+    #chat-window::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* ── Sections inside Sidebar ── */
+    .info-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      white-space: normal;
+    }
+    .info-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .info-card-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-light);
       text-transform: uppercase;
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Academics Info */
+    .academic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .academic-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .academic-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .academic-value {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    /* Collapsible Project Sections */
+    .project-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+    .project-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    .project-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .project-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .metric-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .metric-pill {
+      background: rgba(124, 58, 237, 0.12);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      color: var(--accent-light);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* Badges List */
+    .badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .cert-badge {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Right Content Window (Chat & Voice Controls) ── */
+    .chat-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Top Action Bar */
+    .action-bar {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 12, 26, 0.2);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+
+    .voice-control-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Modern Call Button */
+    #vapi-call-btn {
+      background: var(--success);
+      color: #fff;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
     }
     #vapi-call-btn:hover {
-      background: rgba(0, 242, 254, 0.1);
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+      filter: brightness(1.05);
+    }
+    #vapi-call-btn:active {
+      transform: translateY(0);
     }
 
-    .live-badge {
-      background: rgba(0, 242, 254, 0.1);
-      color: var(--holo-cyan);
-      border: 1px solid rgba(0, 242, 254, 0.3);
-      font-size: 11px; font-weight: 600;
-      padding: 3px 10px; border-radius: 20px;
-      letter-spacing: 1px;
-      animation: pulse 2s infinite;
+    /* Soundwave Visualizer Canvas */
+    .visualizer-container {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+      width: 80px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .visualizer-container.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .wave-bar {
+      width: 3px;
+      height: 4px;
+      background: var(--success);
+      border-radius: 3px;
+      animation: wave-animation 1s ease-in-out infinite alternate;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+
+    @keyframes wave-animation {
+      0% { height: 4px; }
+      100% { height: 24px; }
     }
 
-    @keyframes pulse {
-      0% { opacity: 0.7; box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.2); }
-      70% { opacity: 1; box-shadow: 0 0 0 6px rgba(0, 242, 254, 0); }
-      100% { opacity: 0.7; box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
-    }
-
-    /* ── Chat Window (Fixed Scroll Matrix) ── */
+    /* ── Chat Messages Pane ── */
     #chat-window {
       flex: 1;
       overflow-y: auto;
-      padding: 24px 20px 12px;
-      display: flex; 
-      flex-direction: column; 
-      gap: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch; /* Essential iOS fluid gesture physics */
     }
 
-    .message { display: flex; gap: 10px; max-width: 88%; }
-    .message.user { align-self: flex-end; flex-direction: row-reverse; }
-    .message.assistant { align-self: flex-start; }
+    .message {
+      display: flex;
+      gap: 14px;
+      max-width: 80%;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: show-msg 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes show-msg {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
 
     .msg-icon {
-      width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; flex-shrink: 0; margin-top: 2px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      font-family: var(--font-display);
+      font-weight: 700;
     }
-    .message.user .msg-icon      { background: #22263a; border: 1px solid var(--border); }
-    .message.assistant .msg-icon { background: linear-gradient(135deg, var(--accent), var(--holo-cyan)); color: #fff; font-weight: 700; }
+
+    .message.user .msg-icon {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+    }
+
+    .message.assistant .msg-icon {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #fff;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
 
     .bubble {
-      padding: 12px 16px;
-      border-radius: var(--radius);
+      padding: 14px 18px;
+      border-radius: 18px;
       line-height: 1.6;
       font-size: 14.5px;
+      word-wrap: break-word;
     }
-    .message.user .bubble      { background: var(--user-bubble); border: 1px solid var(--border); border-bottom-right-radius: 4px; }
-    .message.assistant .bubble { background: var(--ai-bubble); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 
-    /* ── Typing Indicator ── */
+    .message.user .bubble {
+      background: var(--user-bubble);
+      border: 1px solid rgba(124, 58, 237, 0.25);
+      border-top-right-radius: 4px;
+      color: #f3e8ff;
+    }
+
+    .message.assistant .bubble {
+      background: var(--ai-bubble);
+      border: 1px solid var(--glass-border);
+      border-top-left-radius: 4px;
+    }
+
+    .source-tag-container {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .source-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--glass-border);
+    }
+
+    /* Typing Indicator bubble */
     .typing-indicator {
       display: none;
       align-self: flex-start;
-      align-items: center; gap: 10px;
-      padding-left: 20px;
-      margin-bottom: 10px;
+      gap: 14px;
+      max-width: 80%;
     }
-    .typing-indicator.visible { display: flex; }
-    .dots { display: flex; gap: 5px; }
+    .typing-indicator.visible {
+      display: flex;
+    }
+
+    .dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 0;
+    }
     .dots span {
-      width: 7px; height: 7px; background: var(--holo-cyan);
-      border-radius: 50%; animation: bounce 1.3s infinite;
+      width: 7px;
+      height: 7px;
+      background: var(--accent-light);
+      border-radius: 50%;
+      animation: bounce 1.3s infinite;
     }
     .dots span:nth-child(2) { animation-delay: 0.15s; }
-    .dots span:nth-child(3) { animation-delay: 0.30s; }
+    .dots span:nth-child(3) { animation-delay: 0.3s; }
+
     @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
-      30% { transform: translateY(-5px); opacity: 1; }
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
     }
 
-    /* ── Holographic Action Slots ── */
-    .slots-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    /* ── Custom Inline Calendar Scheduling Card ── */
+    .slots-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      width: 100%;
+    }
     .slot-btn {
-      background: rgba(108, 99, 255, 0.05);
-      border: 1px solid var(--accent);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 13px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s ease;
+      background: rgba(124, 58, 237, 0.06);
+      border: 1px solid rgba(124, 58, 237, 0.2);
+      color: var(--accent-light);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
-    .slot-btn:hover { 
-      background: var(--accent); 
-      box-shadow: 0 0 10px var(--accent);
-      color: #fff; 
+    .slot-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .slot-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
-    /* ── Booking Form Glass Card ── */
+    /* Booking details overlay form */
     .booking-form {
-      background: var(--surface2);
-      border: 1px solid var(--border-glowing);
-      border-radius: var(--radius);
-      padding: 16px; margin-top: 10px;
-      display: flex; flex-direction: column; gap: 10px;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: show-msg 0.3s ease-out;
     }
-    .booking-form p { font-size: 13px; color: var(--text-muted); }
+
+    .booking-form p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
     .booking-form input {
-      background: rgba(10, 12, 16, 0.8);
-      border: 1px solid var(--border);
+      background: rgba(10, 12, 26, 0.6);
+      border: 1px solid var(--glass-border);
       color: var(--text);
-      border-radius: 8px; padding: 9px 12px; font-size: 14px; outline: none;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      outline: none;
       transition: all 0.2s;
     }
-    .booking-form input:focus { border-color: var(--holo-cyan); box-shadow: 0 0 8px rgba(0, 242, 254, 0.2); }
-    
-    .confirm-btn {
-      background: linear-gradient(135deg, var(--accent), #7c3aed);
-      color: #fff; border: none; border-radius: 8px; padding: 10px;
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
+    .booking-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.2);
     }
-    .confirm-btn:hover { filter: brightness(1.1); }
+
+    .confirm-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .confirm-btn:hover:not(:disabled) {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+    .confirm-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
     .booking-confirmed {
-      background: rgba(0, 242, 254, 0.05);
-      border: 1px solid var(--border-glowing);
-      border-radius: var(--radius);
-      padding: 14px 16px; margin-top: 10px;
-      font-size: 14px; color: var(--holo-cyan);
-      text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
     }
 
-    /* ── Fixed Bottom Panel (Prevents Mobile Viewport Deflection) ── */
-    .bottom-interactive-panel {
-      width: 100%;
-      background: rgba(15, 17, 23, 0.85);
-      border-top: 1px solid var(--border);
-      padding: 12px 20px;
+    /* ── Bottom Text Input Bar ── */
+    .bottom-bar {
+      padding: 20px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(10, 12, 26, 0.2);
+      border-top: 1px solid var(--glass-border);
     }
 
-    #input-bar {
-      display: flex; gap: 10px; align-items: flex-end; width: 100%;
+    /* Starter Prompts list */
+    #starters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .starter {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .starter:hover {
+      background: rgba(124, 58, 237, 0.08);
+      border-color: var(--accent);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
     }
 
     #user-input {
       flex: 1;
-      background: rgba(10, 12, 16, 0.8);
-      border: 1px solid var(--border);
+      background: rgba(10, 12, 26, 0.6);
+      border: 1px solid var(--glass-border);
       color: var(--text);
-      border-radius: var(--radius);
-      padding: 12px 16px; font-size: 14.5px;
-      resize: none; outline: none; line-height: 1.5; max-height: 100px;
-      transition: border-color 0.2s;
-      font-family: var(--font);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-family: var(--font-body);
+      font-size: 14.5px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+      max-height: 140px;
+      transition: all 0.2s;
     }
-    #user-input:focus  { border-color: var(--holo-cyan); box-shadow: 0 0 8px rgba(0, 242, 254, 0.1); }
+    #user-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.15);
+    }
+    #user-input::placeholder {
+      color: var(--text-dark);
+    }
 
     #send-btn {
-      background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent-light);
-      width: 44px; height: 44px; border-radius: 11px;
-      font-size: 18px; cursor: pointer; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s ease;
-    }
-    #send-btn:hover:not(:disabled) { 
-      background: var(--accent); 
+      background: var(--accent);
+      border: none;
       color: #fff;
-      box-shadow: 0 0 10px var(--accent); 
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px var(--accent-glow);
     }
-    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #send-btn:hover:not(:disabled) {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+    }
+    #send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
 
-    /* ── Starter Prompts ── */
-    #starters {
-      display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-bottom: 12px;
+    #send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
-    .starter {
-      background: rgba(34, 38, 58, 0.3);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      border-radius: 20px; padding: 6px 14px; font-size: 13px;
-      cursor: pointer; transition: all 0.2s ease;
-    }
-    .starter:hover { border-color: var(--holo-cyan); color: var(--text); background: rgba(0, 242, 254, 0.02); }
 
-    /* ── Mobile Usability Matrix Tuning Overrides ── */
-    @media (max-width: 768px) {
+    /* ── Responsive Mobile Optimization ── */
+    @media (max-width: 900px) {
       body {
-        background-size: 20px 20px;
+        padding: 0;
       }
-      .dashboard-wrapper {
-        border-left: none;
+      .app-container {
+        border-radius: 0;
+        border: none;
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 260px;
         border-right: none;
+        border-bottom: 1px solid var(--glass-border);
       }
-      #chat-window {
-        padding: 16px 14px 8px;
+      .sidebar-scroll {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        padding: 16px;
+        gap: 16px;
+        height: 120px;
       }
-      .message { max-width: 92%; }
-      .bubble { font-size: 14px; padding: 10px 14px; }
-      .bottom-interactive-panel {
-        padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); /* Accounts for iOS home gesture bar native spacing */
+      .info-card {
+        display: inline-block;
+        min-width: 260px;
+        vertical-align: top;
       }
-      .starter { font-size: 12px; padding: 5px 12px; }
+      .sidebar-header {
+        padding: 16px;
+      }
     }
-
-    #chat-window::-webkit-scrollbar { width: 4px; }
-    #chat-window::-webkit-scrollbar-track { background: transparent; }
-    #chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
   </style>
 </head>
 <body>
 
-<div class="dashboard-wrapper">
-  <header>
-    <div class="avatar">T</div>
-    <div class="header-text">
-      <h1>TAAL CHAWLA // NODE_SYS</h1>
-      <p>Autonomous AI Agent Pipeline Active</p>
+<div class="app-container">
+  
+  <!-- ── SIDEBAR DASHBOARD ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="avatar-glow">T</div>
+      <div>
+        <h1>Taal Chawla</h1>
+        <p><span class="pulse-dot"></span>AI Representative</p>
+      </div>
     </div>
-    <div class="header-actions">
-      <button id="vapi-call-btn">📞 LINK AGENT</button>
-      <div class="live-badge">CORE</div>
-    </div>
-  </header>
+    
+    <div class="sidebar-scroll">
+      
+      <!-- Academic Profile -->
+      <div class="info-card">
+        <div class="info-card-title">🎓 Education</div>
+        <div class="academic-grid">
+          <div class="academic-item">
+            <span class="academic-label">University</span>
+            <span class="academic-value" title="Maharaja Agrasen Institute of Technology">MAIT, GGSIPU</span>
+          </div>
+          <div class="academic-item">
+            <span class="academic-label">Degree</span>
+            <span class="academic-value">B.Tech ECE (AI/ML)</span>
+          </div>
+          <div class="academic-item" style="margin-top: 8px;">
+            <span class="academic-label">CGPA</span>
+            <span class="academic-value">8.32 / 10</span>
+          </div>
+          <div class="academic-item" style="margin-top: 8px;">
+            <span class="academic-label">Graduation</span>
+            <span class="academic-value">May 2027</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Project Metrics -->
+      <div class="info-card">
+        <div class="info-card-title">🚀 Core Projects</div>
+        
+        <div class="project-item">
+          <div class="project-title">NexusOps</div>
+          <div class="project-desc">Autonomous Kubernetes agentic workflow engine featuring Human-in-the-loop gating.</div>
+          <div class="metric-pill-container">
+            <span class="metric-pill">20x Latency (12ms)</span>
+            <span class="metric-pill">0.95 RAGAS</span>
+            <span class="metric-pill">LangGraph HITL</span>
+          </div>
+        </div>
+        
+        <div class="project-item" style="border-bottom:none; padding-bottom:0; margin-bottom:0;">
+          <div class="project-title">Brain Tumor Classification</div>
+          <div class="project-desc">Uncertainty quantification models built for clinical brain tumor classification tasks.</div>
+          <div class="metric-pill-container">
+            <span class="metric-pill">ECE: 0.124 to 0.031</span>
+            <span class="metric-pill">2.78% Hallucination</span>
+            <span class="metric-pill">Patient-wise Split</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Certifications -->
+      <div class="info-card">
+        <div class="info-card-title">📜 Certifications</div>
+        <div class="badge-list">
+          <div class="cert-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Anthropic MCP (2026)
+          </div>
+          <div class="cert-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            HuggingFace Fine-Tuning
+          </div>
+        </div>
+      </div>
+      
+      <!-- Research & Experience -->
+      <div class="info-card">
+        <div class="info-card-title">🔬 Internship</div>
+        <div class="project-title">DRDO Research Intern</div>
+        <div class="project-desc" style="margin-top: 4px;">8-week research tenure at Solid State Physics Laboratory (SSPL), DRDO. Synthesized Raman Spectroscopy and signal analysis to study Silicon Carbide Polytypes.</div>
+      </div>
 
-  <div id="chat-window"></div>
-
-  <div class="typing-indicator" id="typing">
-    <div class="msg-icon" style="background:linear-gradient(135deg,#6c63ff,#00f2fe);color:#fff;font-weight:700;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">T</div>
-    <div class="bubble" style="background:var(--ai-bubble);border:1px solid var(--border);">
-      <div class="dots"><span></span><span></span><span></span></div>
     </div>
-  </div>
-
-  <div class="bottom-interactive-panel">
-    <div id="starters">
-      <button class="starter" onclick="sendStarter(this)">Why should you hire Taal?</button>
-      <button class="starter" onclick="sendStarter(this)">Tell me about NexusOps</button>
-      <button class="starter" onclick="sendStarter(this)">What are her key skills?</button>
-      <button class="starter" onclick="sendStarter(this)">Schedule a call</button>
+  </aside>
+  
+  <!-- ── MAIN CHAT & VOICE INTERFACE ── -->
+  <main class="chat-section">
+    
+    <!-- Action Bar / Header -->
+    <div class="action-bar">
+      <div>
+        <div style="font-size: 15px; font-weight: 600;">System Grounding Desk</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Fully RAG-grounded with source mapping</div>
+      </div>
+      <div class="voice-control-group">
+        <!-- Soundwave visualizer bars -->
+        <div class="visualizer-container" id="visualizer">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <!-- Vapi Trigger Button -->
+        <button id="vapi-call-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          Talk to Agent
+        </button>
+      </div>
     </div>
-
-    <div id="input-bar">
-      <textarea id="user-input" rows="1" placeholder="Query agent matrix..."></textarea>
-      <button id="send-btn" onclick="sendMessage()" title="Send">&#8593;</button>
+    
+    <!-- Chat window -->
+    <div id="chat-window"></div>
+    
+    <!-- Typing indicator -->
+    <div class="typing-indicator" id="typing">
+      <div class="msg-icon">T</div>
+      <div>
+        <div class="bubble">
+          <div class="dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
     </div>
-  </div>
+    
+    <!-- Bottom Entry Area -->
+    <div class="bottom-bar">
+      <!-- Starter prompts -->
+      <div id="starters">
+        <button class="starter" onclick="sendStarter(this)">Why hire Taal?</button>
+        <button class="starter" onclick="sendStarter(this)">Tell me about NexusOps</button>
+        <button class="starter" onclick="sendStarter(this)">What are her calibration metrics?</button>
+        <button class="starter" onclick="sendStarter(this)">Schedule a meeting</button>
+      </div>
+      
+      <div class="input-wrapper">
+        <textarea id="user-input" rows="1" placeholder="Ask anything about Taal's work..."></textarea>
+        <button id="send-btn" onclick="sendMessage()" title="Send Message">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
+    
+  </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@1.0.0/dist/vapi.browser.js"></script>
+<!-- Vapi Web SDK (v2.x) -->
+<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.5.2/dist/vapi.min.js"></script>
 
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const API_BASE = window.location.origin;
-    const chatWindow = document.getElementById("chat-window");
-    const input = document.getElementById("user-input");
-    const sendBtn = document.getElementById("send-btn");
-    const typing = document.getElementById("typing");
-    const starters = document.getElementById("starters");
+  const API_BASE = window.location.origin;
+  const chatWindow = document.getElementById("chat-window");
+  const input = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+  const typing = document.getElementById("typing");
+  const starters = document.getElementById("starters");
+  const visualizer = document.getElementById("visualizer");
+  const voiceCallBtn = document.getElementById('vapi-call-btn');
 
-    let conversationHistory = [];
-    let pendingSlotStart = null;
+  let conversationHistory = [];
+  let pendingSlotStart = null;
+  let isVoiceActive = false;
 
-    // ── VAPI SECURITY & CHANNEL ORCHESTRATION ──
-    // PASTE YOUR KEYS HERE IF DEPLOYING WEB OVERLAY:
-    const VAPI_PUBLIC_KEY = 'your_extracted_widget_public_key_here'; 
-    const VAPI_ASSISTANT_ID = 'your_extracted_assistant_id_here';
+  // ── VAPI Voice Agent Setup ──
+  const VAPI_PUBLIC_KEY = 'c476ff04-a3e4-433b-b28e-c829c94f9c6d'; 
+  
+  // CRITICAL: Replace this with your exact Vapi Assistant ID from the dashboard.
+  // If left as a placeholder or empty, it will fall back to using your configured phone call/assistant link.
+  const VAPI_ASSISTANT_ID = '331826b1-6a2c-473d-82d2-850f142b7803'; 
 
-    const vapi = new Vapi(VAPI_PUBLIC_KEY);
-    const voiceCallBtn = document.getElementById('vapi-call-btn');
-    let isVoiceActive = false;
+  let vapi = null;
+  try {
+    const VapiClass = window.Vapi?.default || window.Vapi;
+    if (VapiClass) {
+      vapi = new VapiClass(VAPI_PUBLIC_KEY);
+    } else {
+      console.warn("Vapi global class not found in window object.");
+    }
+    
+    // Register SDK call events
+    vapi.on('call-start', () => {
+      console.log("WebRTC voice session connected.");
+      voiceCallBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>
+        End Voice Call`;
+      voiceCallBtn.style.background = "var(--danger)";
+      voiceCallBtn.style.boxShadow = "0 0 15px rgba(239, 68, 68, 0.4)";
+      visualizer.classList.add("active");
+      isVoiceActive = true;
+    });
 
-    if (voiceCallBtn && VAPI_PUBLIC_KEY !== 'your_extracted_widget_public_key_here') {
-      voiceCallBtn.addEventListener('click', () => {
-        if (!isVoiceActive) {
-          console.log("[INFRA] Connecting live WebRTC vector streams...");
-          vapi.start(VAPI_ASSISTANT_ID);
-          voiceCallBtn.innerHTML = "🛑 DISCONNECT";
-          voiceCallBtn.style.border = "1px solid var(--danger)";
-          voiceCallBtn.style.color = "var(--danger)";
-          isVoiceActive = true;
-        } else {
-          vapi.stop();
-          resetVoiceButton();
+    vapi.on('call-end', () => {
+      console.log("WebRTC voice session disconnected.");
+      resetVoiceUI();
+    });
+
+    vapi.on('error', (err) => {
+      console.error("Vapi Connection Error:", err);
+      alert("Microphone connection failed. Please ensure mic access permissions are granted to the browser.");
+      resetVoiceUI();
+    });
+  } catch (err) {
+    console.error("Vapi initialization failed:", err);
+  }
+
+  function resetVoiceUI() {
+    voiceCallBtn.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      Talk to Agent`;
+    voiceCallBtn.style.background = "var(--success)";
+    voiceCallBtn.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.3)";
+    visualizer.classList.remove("active");
+    isVoiceActive = false;
+  }
+
+  voiceCallBtn.addEventListener('click', () => {
+    if (!vapi) {
+      alert("Vapi library is not initialized.");
+      return;
+    }
+    
+    if (!isVoiceActive) {
+      if (!VAPI_ASSISTANT_ID || VAPI_ASSISTANT_ID === 'YOUR_VAPI_ASSISTANT_ID_HERE') {
+        // Fallback placeholder warning
+        const devId = prompt("Vapi Assistant ID is missing. Please enter your Vapi Assistant UUID to call directly, or set VAPI_ASSISTANT_ID in index.html:", "");
+        if (devId) {
+          vapi.start(devId.trim());
         }
-      });
-    }
-
-    function resetVoiceButton() {
-      if (voiceCallBtn) {
-        voiceCallBtn.innerHTML = "📞 LINK AGENT";
-        voiceCallBtn.style.border = "1px solid var(--holo-cyan)";
-        voiceCallBtn.style.color = "var(--holo-cyan)";
-        isVoiceActive = false;
+      } else {
+        vapi.start(VAPI_ASSISTANT_ID);
       }
+    } else {
+      vapi.stop();
     }
+  });
 
-    vapi.on('call-end', () => { resetVoiceButton(); });
 
-    // ── TEXT CONVERSATION AND TEXT OVERFLOW FLOWS ──
-    input.addEventListener("input", () => {
-      input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight, 100) + "px";
-    });
+  // ── Chat Engine Logic ──
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-    });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 140) + "px";
+  });
 
-    window.sendStarter = function(btn) {
-      input.value = btn.textContent;
-      starters.style.display = "none";
-      sendMessage();
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { 
+      e.preventDefault(); 
+      sendMessage(); 
     }
+  });
 
-    function appendMessage(role, content, extraHtml = "") {
-      const div = document.createElement("div");
-      div.className = `message ${role}`;
-      const icon = role === "user" ? "👤" : "T";
-      div.innerHTML = `
-        <div class="msg-icon">${icon}</div>
-        <div>
-          <div class="bubble">${content}</div>
-          ${extraHtml}
+  function sendStarter(btn) {
+    input.value = btn.textContent;
+    starters.style.display = "none";
+    sendMessage();
+  }
+
+  function appendMessage(role, content, extraHtml = "", sources = []) {
+    const div = document.createElement("div");
+    div.className = `message ${role}`;
+    const icon = role === "user" ? "👤" : "T";
+    
+    let sourceBadges = "";
+    if (sources && sources.length > 0) {
+      sourceBadges = `
+        <div class="source-tag-container">
+          ${sources.map(s => `<span class="source-tag">source: ${s}</span>`).join("")}
         </div>`;
-      chatWindow.appendChild(div);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-      return div;
     }
 
-    function showTyping() {
-      chatWindow.appendChild(typing);
-      typing.classList.add("visible");
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+    div.innerHTML = `
+      <div class="msg-icon">${icon}</div>
+      <div style="flex: 1;">
+        <div class="bubble">${content}</div>
+        ${sourceBadges}
+        ${extraHtml}
+      </div>`;
+      
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return div;
+  }
 
-    function hideTyping() {
-      typing.classList.remove("visible");
-    }
+  function showTyping() {
+    chatWindow.appendChild(typing);
+    typing.classList.add("visible");
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
 
-    window.sendMessage = async function() {
-      const text = input.value.trim();
-      if (!text) return;
+  function hideTyping() {
+    typing.classList.remove("visible");
+  }
 
-      starters.style.display = "none";
-      input.value = "";
-      input.style.height = "auto";
-      sendBtn.disabled = true;
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
 
-      appendMessage("user", escapeHtml(text));
-      conversationHistory.push({ role: "user", content: text });
-      showTyping();
+    starters.style.display = "none";
+    input.value = "";
+    input.style.height = "auto";
+    sendBtn.disabled = true;
 
-      const schedulingKeywords = ["schedule", "book", "call", "meeting", "available", "availability", "slot", "time"];
-      const wantsBooking = schedulingKeywords.some(kw => text.toLowerCase().includes(kw));
+    appendMessage("user", escapeHtml(text));
+    conversationHistory.push({ role: "user", content: text });
+    showTyping();
 
-      try {
-        if (wantsBooking) {
-          await handleBookingFlow(text);
-        } else {
-          await handleChat(text);
-        }
-      } catch (err) {
-        hideTyping();
-        appendMessage("assistant", "CRITICAL_ERROR: Connection to inference node dropped. Reload session context.");
+    const schedulingKeywords = ["schedule", "book", "call", "meeting", "available", "availability", "slot", "time"];
+    const wantsBooking = schedulingKeywords.some(kw => text.toLowerCase().includes(kw));
+
+    try {
+      if (wantsBooking) {
+        await handleBookingFlow(text);
+      } else {
+        await handleChat(text);
       }
-
-      sendBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      hideTyping();
+      appendMessage("assistant", "I ran into a connection issue. Please verify the server is running and try again.");
     }
 
-    async function handleChat(text) {
-      const res = await fetch(`${API_BASE}/chat`, {
+    sendBtn.disabled = false;
+  }
+
+  async function handleChat(text) {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
+    });
+    const data = await res.json();
+    hideTyping();
+    const reply = data.response || "I couldn't generate a response. Please check backend configs.";
+    appendMessage("assistant", escapeHtml(reply), "", data.sources_used);
+    conversationHistory.push({ role: "assistant", content: reply });
+  }
+
+  async function handleBookingFlow(text) {
+    // Call chat to get grounded answer text
+    const chatRes = await fetch(`${API_BASE}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
+    });
+    const chatData = await chatRes.json();
+    const reply = chatData.response || "";
+
+    // Call calendar availability
+    const slotsRes = await fetch(`${API_BASE}/check-availability`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ timezone: "Asia/Kolkata" })
+    });
+    const slotsData = await slotsRes.json();
+    hideTyping();
+
+    if (!slotsData.slots || slotsData.slots.length === 0) {
+      appendMessage("assistant", escapeHtml(reply) + "\n\n(I couldn't locate any free slots on Taal's calendar at the moment. Please contact her directly.)", "", chatData.sources_used);
+      return;
+    }
+
+    const slotsHtml = `
+      <div class="slots-container">
+        ${slotsData.slots.map(s =>
+          `<button class="slot-btn" onclick="selectSlot('${s.start}', '${escapeHtml(s.display)}', this)">
+            <span>Time Slot</span>
+            <strong>${s.display}</strong>
+          </button>`
+        ).join("")}
+      </div>`;
+
+    appendMessage("assistant", escapeHtml(reply), slotsHtml, chatData.sources_used);
+  }
+
+  function selectSlot(isoStart, displayTime, btn) {
+    pendingSlotStart = isoStart;
+    
+    // Disable other slots, highlight chosen
+    document.querySelectorAll(".slot-btn").forEach(b => b.disabled = true);
+    btn.disabled = false;
+    btn.style.background = "var(--accent)";
+    btn.style.borderColor = "var(--accent)";
+    btn.style.color = "#fff";
+
+    // Remove existing booking forms if any
+    const oldForm = document.querySelector(".booking-form");
+    if (oldForm) oldForm.remove();
+
+    const formDiv = document.createElement("div");
+    formDiv.className = "booking-form";
+    formDiv.innerHTML = `
+      <p>Booking interview call for slot: <strong>${displayTime}</strong>. Please enter details:</p>
+      <input id="booking-name" type="text" placeholder="Full Name" required />
+      <input id="booking-email" type="email" placeholder="Email Address" required />
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmBooking()">Confirm Meeting</button>`;
+      
+    btn.parentNode.parentNode.appendChild(formDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  async function confirmBooking() {
+    const nameInput = document.getElementById("booking-name");
+    const emailInput = document.getElementById("booking-email");
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    
+    if (!name || !email) {
+      alert("Please provide both name and email fields.");
+      return;
+    }
+
+    const confirmBtn = document.getElementById("confirm-btn");
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Locking in slot...";
+
+    try {
+      const res = await fetch(`${API_BASE}/book-slot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
+        body: JSON.stringify({
+          slot_start: pendingSlotStart,
+          attendee_name: name,
+          attendee_email: email,
+          timezone: "Asia/Kolkata"
+        })
       });
       const data = await res.json();
-      hideTyping();
-      const reply = data.response || "Inference node timeout. Reissue statement block.";
-      appendMessage("assistant", escapeHtml(reply));
-      conversationHistory.push({ role: "assistant", content: reply });
-    }
+      
+      const form = document.querySelector(".booking-form");
+      const slotsContainer = form.previousElementSibling;
+      form.remove();
+      slotsContainer.remove();
 
-    async function handleBookingFlow(text) {
-      const chatRes = await fetch(`${API_BASE}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, conversation_history: conversationHistory.slice(-6) })
-      });
-
-      const slotsRes = await fetch(`${API_BASE}/check-availability`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ timezone: "Asia/Kolkata" })
-      });
-      const slotsData = await slotsRes.json();
-      hideTyping();
-
-      if (!slotsData.slots || slotsData.slots.length === 0) {
-        appendMessage("assistant", "I couldn't locate available calendar slots right now. Please message Taal directly via email.");
-        return;
+      if (data.confirmed) {
+        const confirmDiv = document.createElement("div");
+        confirmDiv.className = "booking-confirmed";
+        confirmDiv.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:2px; flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div>
+            <strong>Booking Confirmed!</strong><br>
+            ${escapeHtml(data.confirmation_message)}
+          </div>`;
+        chatWindow.appendChild(confirmDiv);
+        conversationHistory.push({ role: "assistant", content: data.confirmation_message });
+      } else {
+        appendMessage("assistant", "The booking request was rejected by the server. Please reload and select a different slot.");
       }
-
-      const slotsHtml = `
-        <div class="slots-container">
-          ${slotsData.slots.map(s =>
-            `<button class="slot-btn" onclick="selectSlot('${s.start}', '${escapeHtml(s.display)}', this)">${s.display}</button>`
-          ).join("")}
-        </div>`;
-
-      appendMessage("assistant", "Syncing schedule matrices. Select an open availability node below:", slotsHtml);
+    } catch (err) {
+      console.error(err);
+      appendMessage("assistant", "Calendar integration failed. Please contact Taal directly.");
     }
 
-    window.selectSlot = function(isoStart, displayTime, btn) {
-      pendingSlotStart = isoStart;
-      document.querySelectorAll(".slot-btn").forEach(b => b.disabled = true);
-      btn.style.background = "var(--accent)";
-      btn.style.borderColor = "var(--holo-cyan)";
-      btn.style.color = "#fff";
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
 
-      const formDiv = document.createElement("div");
-      formDiv.className = "booking-form";
-      formDiv.innerHTML = `
-        <p>Allocating seat block: <strong>${displayTime}</strong>. Input validation vectors:</p>
-        <input id="booking-name" type="text" placeholder="Identity String (Name)" />
-        <input id="booking-email" type="email" placeholder="Routing Node (Email)" />
-        <button class="confirm-btn" id="confirm-btn" onclick="confirmBooking()">Commit Calendar Block</button>`;
-      chatWindow.appendChild(formDiv);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+      .replace(/\n/g, "<br>");
+  }
 
-    window.confirmBooking = async function() {
-      const name = document.getElementById("booking-name").value.trim();
-      const email = document.getElementById("booking-email").value.trim();
-      if (!name || !email) {
-        alert("Parameters incomplete. Identity and routing vectors are required.");
-        return;
-      }
-
-      document.getElementById("confirm-btn").disabled = true;
-      document.getElementById("confirm-btn").textContent = "Writing transaction matrix...";
-
-      try {
-        const res = await fetch(`${API_BASE}/book-slot`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            slot_start: pendingSlotStart,
-            attendee_name: name,
-            attendee_email: email,
-            timezone: "Asia/Kolkata"
-          })
-        });
-        const data = await res.json();
-
-        document.querySelector(".booking-form").remove();
-
-        if (data.confirmed) {
-          const confirmDiv = document.createElement("div");
-          confirmDiv.className = "booking-confirmed";
-          confirmDiv.innerHTML = `✓ <strong>Transaction committed:</strong> ${data.confirmation_message}`;
-          chatWindow.appendChild(confirmDiv);
-          conversationHistory.push({ role: "assistant", content: data.confirmation_message });
-        } else {
-          appendMessage("assistant", "Transaction failed to commit to main cluster branch. Reissue attempt.");
-        }
-      } catch (err) {
-        appendMessage("assistant", "Upstream calendar engine dropped the handshake packet. Contact target directly.");
-      }
-
-      chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
-
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/\n/g, "<br>");
-    }
-
-    // Initial greeting sequence
+  window.addEventListener("DOMContentLoaded", () => {
     appendMessage("assistant",
-      "SYSTEM RUNLEVEL 5 // Welcome. I am Taal Chawla's proxy representative node. I have direct context vectors regarding her engineering foundations in machine learning systems (NexusOps, Brain Tumor Calibration) and native calendar availability. State your operational query."
+      "Hello! I am Taal Chawla's AI representative. I can answer questions about her research in ML system calibration, RAG architecture for her NexusOps orchestration engine, or help you book an interview slot on her calendar. What would you like to discuss today?"
     );
   });
 </script>
