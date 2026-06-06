@@ -495,8 +495,11 @@
 
 <!-- Vapi voice — ES module, loaded separately after DOM is ready -->
 <script type="module">
-  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web/dist/vapi.mjs";
+  import Vapi from "https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.mjs";
+  console.log("Vapi loaded");
+  console.log(Vapi);
 
+  const VAPI_PUBLIC_KEY = "f1c0ccba-2bec-402e-900d-56c729917e76";
   const VAPI_ASSISTANT_ID = "a411f750-584b-4c68-9e26-2b291eb58754";
 
   const btn        = document.getElementById("vapi-call-btn");
@@ -525,6 +528,7 @@
   }
 
   btn.addEventListener("click", () => {
+    console.log("Button clicked");
     active ? vapi.stop() : vapi.start(VAPI_ASSISTANT_ID);
   });
 </script>
