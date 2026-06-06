@@ -380,7 +380,11 @@
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 
-  function sendStarter(btn) { input.value = btn.textContent; starters.style.display = "none"; sendMessage(); }
+  function sendStarter(btn) { 
+    input.value = btn.textContent; 
+    starters.style.display = "none"; 
+    sendMessage(); 
+  }
 
   function appendMessage(role, content, extraHtml = "", sources = []) {
     const div = document.createElement("div");
@@ -497,7 +501,7 @@
   }
 
   window.addEventListener("DOMContentLoaded", () => {
-    appendMessage("assistant", "Hello! I'm Taal Chawla's AI representative. Ask me about her ML projects, research, or book an interview slot directly. What would you like to know?");
+    appendMessage("assistant", "Hello! I'm Taal Chawla's AI representative. Ask me about her ML projects, research, or schedule a call with her directly. What would you like to know?");
   });
 </script>
 
