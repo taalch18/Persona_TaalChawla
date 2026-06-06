@@ -901,12 +901,8 @@
   let pendingSlotStart = null;
   let isVoiceActive = false;
 
-  // ── VAPI Voice Agent Setup ──
-  const VAPI_PUBLIC_KEY = 'c476ff04-a3e4-433b-b28e-c829c94f9c6d'; 
   
-  // CRITICAL: Replace this with your exact Vapi Assistant ID from the dashboard.
-  // If left as a placeholder or empty, it will fall back to using your configured phone call/assistant link.
-  const VAPI_ASSISTANT_ID = '331826b1-6a2c-473d-82d2-850f142b7803'; 
+  const VAPI_ASSISTANT_ID = 'a411f750-584b-4c68-9e26-2b291eb58754'; 
 
   let vapi = null;
   try {
@@ -917,7 +913,6 @@
       console.warn("Vapi global class not found in window object.");
     }
     
-    // Register SDK call events
     vapi.on('call-start', () => {
       console.log("WebRTC voice session connected.");
       voiceCallBtn.innerHTML = `
