@@ -11,7 +11,7 @@
   },
   {
     "question": "What is the RAGAS Faithfulness score for NexusOps?",
-    "expected_keywords": ["0.95"],
+    "expected_keywords": ["0.95","faithfulness"],
     "source": "nexusops"
   },
   {

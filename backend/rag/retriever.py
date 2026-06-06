@@ -1,49 +1,84 @@
+"""
+Retriever — embeds query via HuggingFace Inference API, queries Pinecone.
+Uses all-MiniLM-L6-v2 via HF API — same model as local, same 384-dim vectors.
+No torch, no sentence-transformers — works on Railway free tier.
+"""
+
 import asyncio
 import os
-from typing import List, Optional
+from typing import Optional
+from functools import lru_cache
+
+import httpx
 from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
 
-class LocalSearchClient:
-    def __init__(self) -> None:
-        self.pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-        self.index = self.pc.Index(os.getenv("PINECONE_INDEX_NAME", "taal-persona"))
-        # Initializes the model directly into local RAM/CPU memory once
-        self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+HF_API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
 
-    async def retrieve(self, query: str, top_k: int = 5, source_filter: Optional[str] = None) -> List[str]:
-        # 1. Generate the 384-dimensional vector embedding on the local CPU thread pool
-        vector_embeddings = await asyncio.to_thread(self.model.encode, [query])
-        vector = vector_embeddings[0].tolist()
 
-        # 2. Build explicit parameters
-        params = {
-            "vector": vector,
-            "top_k": top_k,
-            "include_metadata": True,
-        }
-        if source_filter:
-            params["filter"] = {"source": {"$eq": source_filter}}
+@lru_cache(maxsize=1)
+def _get_index():
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    return pc.Index(os.getenv("PINECONE_INDEX_NAME", "taal-persona"))
 
-        # 3. Offload blocking synchronous Pinecone network I/O to a background thread
-        results = await asyncio.to_thread(self.index.query, **params)
 
-        # 4. Extract and return the raw text chunks cleanly
-        return [
-            match["metadata"]["text"] 
-            for match in results.get("matches", []) 
-            if match.get("metadata") and "text" in match["metadata"]
-        ]
+async def _embed(text: str) -> list[float]:
+    """Embed text via HuggingFace Inference API — returns 384-dim vector."""
+    headers = {}
+    hf_token = os.getenv("HF_TOKEN")
+    if hf_token:
+        headers["Authorization"] = f"Bearer {hf_token}"
 
-# Concurrency-safe lazy initialization state
-_client: Optional[LocalSearchClient] = None
-_lock = asyncio.Lock()
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.post(
+            HF_API_URL,
+            headers=headers,
+            json={"inputs": text, "options": {"wait_for_model": True}},
+        )
+        response.raise_for_status()
+        result = response.json()
 
-async def retrieve(query: str, top_k: int = 5, source_filter: Optional[str] = None) -> List[str]:
-    global _client
-    if _client is None:
-        async with _lock:
-            if _client is None:
-                _client = LocalSearchClient()
-                
-    return await _client.retrieve(query, top_k, source_filter)
+    # HF returns either a flat list or nested list depending on input
+    if isinstance(result[0], list):
+        return result[0]
+    return result
+
+
+async def retrieve(
+    query: str,
+    top_k: int = 3,
+    source_filter: Optional[str] = None,
+) -> list[str]:
+    """
+    Embed query and retrieve matching chunks from Pinecone.
+    Returns list of chunk text strings.
+    """
+    index = _get_index()
+
+    # 1. Embed the query
+    try:
+        vector = await _embed(query)
+    except Exception as e:
+        print(f"[RETRIEVER] Embedding failed: {e}")
+        return []
+
+    # 2. Build Pinecone query
+    query_params = {
+        "vector": vector,
+        "top_k": top_k,
+        "include_metadata": True,
+    }
+    if source_filter:
+        query_params["filter"] = {"source": {"$eq": source_filter}}
+
+    # 3. Pinecone SDK is sync — offload to thread
+    results = await asyncio.to_thread(index.query, **query_params)
+
+    # 4. Extract chunk texts
+    chunks = [
+        match["metadata"]["text"]
+        for match in results.get("matches", [])
+        if match.get("metadata") and "text" in match["metadata"]
+    ]
+
+    print(f"[RAG RETRIEVAL] Extracted {len(chunks)} valid context chunks for filter: '{source_filter}'")
+    return chunks

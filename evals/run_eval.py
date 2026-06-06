@@ -1,89 +1,111 @@
 """
-Hallucination evaluation runner - validates the live local Groq/Pinecone engine.
+Hallucination eval — run against the live local server.
 Usage: python evals/run_eval.py
 
-Requires your FastAPI server to be running at http://localhost:8000.
+Requires the FastAPI server to be running at localhost:8000.
+3-second delay between requests to avoid Gemini free-tier RPM limits.
 """
 
 import asyncio
 import json
-import sys
+import time
 from pathlib import Path
+
 import httpx
 
-# Establish strict absolute path routing for Taal's Desktop Workspace
-WORKSPACE_ROOT = Path(r"C:\Users\Taal\OneDrive\Desktop\Persona_TaalChawla")
 API_URL = "http://localhost:8000/chat"
+REQUEST_DELAY_SECONDS = 6  
 
 
 async def run_eval():
-    qa_path = WORKSPACE_ROOT / "evals" / "golden_qa.json"
-    if not qa_path.exists():
-        print(f"ERROR: Could not locate the golden dataset at: {qa_path}")
-        sys.exit(1)
-
-    with open(qa_path, encoding="utf-8") as f:
+    qa_path = Path(__file__).parent / "golden_qa.json"
+    with open(qa_path) as f:
         qa_pairs = json.load(f)
 
-    results = []
     print(f"Starting test execution cycle across {len(qa_pairs)} evaluation targets...\n")
 
+    results = []
     async with httpx.AsyncClient(timeout=30) as client:
         for i, qa in enumerate(qa_pairs):
+
             try:
                 response = await client.post(
                     API_URL,
                     json={"message": qa["question"], "conversation_history": []},
                 )
-                
-                # Check for bad HTTP response states (e.g., 500 Internal Server Errors)
+
                 if response.status_code != 200:
-                    print(f"[{i+1:02d}] ERROR (Status {response.status_code}) — {qa['question'][:50]}...")
-                    continue
-                    
-                response_data = response.json()
-                answer = response_data.get("response", "").lower()
-                
+                    print(f"[{i+1:02d}] ERROR (Status {response.status_code}) — {qa['question'][:60]}...")
+                    results.append({
+                        "question": qa["question"],
+                        "source": qa["source"],
+                        "score": 0.0,
+                        "hallucination": True,
+                        "error": f"HTTP {response.status_code}",
+                        "keywords_found": [],
+                        "keywords_missed": qa["expected_keywords"],
+                    })
+                else:
+                    answer = response.json().get("response", "").lower()
+                    hits = [kw.lower() in answer for kw in qa["expected_keywords"]]
+                    score = sum(hits) / len(hits)
+                    is_hallucination = score == 0.0
+
+                    status = "PASS" if score >= 0.5 else "FAIL"
+                    print(f"[{i+1:02d}] {status} ({score:.0%}) — {qa['question'][:60]}...")
+
+                    results.append({
+                        "question": qa["question"],
+                        "source": qa["source"],
+                        "score": round(score, 2),
+                        "hallucination": is_hallucination,
+                        "keywords_found": [kw for kw, hit in zip(qa["expected_keywords"], hits) if hit],
+                        "keywords_missed": [kw for kw, hit in zip(qa["expected_keywords"], hits) if not hit],
+                    })
+
             except Exception as e:
-                print(f"[{i+1:02d}] HTTP CONNECTION FAILED — {qa['question'][:50]}... Error: {e}")
-                continue
+                print(f"[{i+1:02d}] ERROR (Exception) — {qa['question'][:60]}... | {e}")
+                results.append({
+                    "question": qa["question"],
+                    "source": qa["source"],
+                    "score": 0.0,
+                    "hallucination": True,
+                    "error": str(e),
+                    "keywords_found": [],
+                    "keywords_missed": qa["expected_keywords"],
+                })
 
-            # Compute hit densities across required architectural keyword flags
-            hits = [kw.lower() in answer for kw in qa["expected_keywords"]]
-            score = sum(hits) / len(hits) if hits else 0.0
-            is_hallucination = score == 0.0
+            # Delay between requests — critical for Gemini free-tier RPM limits
+            if i < len(qa_pairs) - 1:
+                time.sleep(REQUEST_DELAY_SECONDS)
 
-            results.append({
-                "question": qa["question"],
-                "source": qa["source"],
-                "score": round(score, 2),
-                "hallucination": is_hallucination,
-                "keywords_found": [kw for kw, hit in zip(qa["expected_keywords"], hits) if hit],
-                "keywords_missed": [kw for kw, hit in zip(qa["expected_keywords"], hits) if not hit],
-            })
-            
-            status = "PASS" if score >= 0.5 else "FAIL"
-            print(f"[{i+1:02d}] {status} ({score:.0%}) — {qa['question'][:60]}...")
+    print("\n" + "=" * 60)
 
-    if not results:
-        print("\n============================================================")
-        print("ERROR: Zero evaluations successfully compiled. Check backend connectivity.")
-        return []
+    # Only count non-error results in metrics
+    valid = [r for r in results if "error" not in r]
+    error_count = len(results) - len(valid)
 
-    print("\n" + "="*60)
-    hallucination_rate = sum(r["hallucination"] for r in results) / len(results)
-    avg_score = sum(r["score"] for r in results) / len(results)
-    
-    print(f"Hallucination Rate : {hallucination_rate:.1%}  (target: <20%)")
-    print(f"Average Score      : {avg_score:.1%}  (target: >70%)")
+    if valid:
+        hallucination_rate = sum(r["hallucination"] for r in valid) / len(valid)
+        avg_score = sum(r["score"] for r in valid) / len(valid)
+        print(f"Hallucination Rate : {hallucination_rate:.1%}  (target: <20%)")
+        print(f"Average Score      : {avg_score:.1%}  (target: >70%)")
     print(f"Total questions    : {len(results)}")
+    print(f"Errors (500/timeout): {error_count}")
 
-    failed = [r for r in results if r["hallucination"]]
+    failed = [r for r in results if r.get("hallucination") and "error" not in r]
     if failed:
         print(f"\nFailed questions ({len(failed)}):")
         for r in failed:
             print(f"  - {r['question']}")
-            print(f"    Missed keywords: {r['keywords_missed']}")
+            print(f"    Missed: {r['keywords_missed']}")
+
+    errors = [r for r in results if "error" in r]
+    if errors:
+        print(f"\nError questions ({len(errors)}):")
+        for r in errors:
+            print(f"  - {r['question']}")
+            print(f"    Error: {r['error']}")
 
     return results
 
